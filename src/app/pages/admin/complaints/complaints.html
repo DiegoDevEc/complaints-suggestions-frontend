@@ -13,21 +13,11 @@
     </ng-template>
     <ng-template #header>
         <tr>
-            <th pSortableColumn="name" style="min-width:16rem">
-                Nombre
-            </th>
-            <th pSortableColumn="category" style="min-width:10rem">
-                Apellido
-            </th>
-            <th pSortableColumn="category" style="min-width:10rem">
-                Teléfono
-            </th>
-            <th pSortableColumn="category" style="min-width:10rem">
-                Email
-            </th>
-            <th pSortableColumn="inventoryStatus" style="min-width: 12rem">
-                Estado
-            </th>
+            <th pSortableColumn="name" style="min-width: 16rem">Nombre</th>
+            <th pSortableColumn="category" style="min-width: 10rem">Apellido</th>
+            <th pSortableColumn="category" style="min-width: 10rem">Teléfono</th>
+            <th pSortableColumn="category" style="min-width: 10rem">Email</th>
+            <th pSortableColumn="inventoryStatus" style="min-width: 12rem">Estado</th>
             <th style="min-width: 12rem"></th>
         </tr>
     </ng-template>
@@ -53,7 +43,6 @@
 <p-dialog [(visible)]="complaintsDialog" [style]="{ width: '450px' }" header="Detalle de la Queja" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
-
             <div>
                 <label for="name" class="block font-bold mb-3">Denunciante</label>
                 <input type="text" pInputText id="name" [(ngModel)]="feedback.firstName" required autofocus fluid />
@@ -64,6 +53,13 @@
                     fluid></textarea>
             </div>
 
+            <div>
+                <label for="status" class="block font-bold mb-3">Estado</label>
+                <p-select inputId="status" [(ngModel)]="feedback.status" [options]="statuses" optionLabel="label"
+                    optionValue="value" placeholder="Seleccione" class="w-full" />
+            </div>
+
+
         </div>
     </ng-template>
 
@@ -73,4 +69,4 @@
     </ng-template>
 </p-dialog>
 
- <p-confirmdialog [style]="{ width: '550px' }" />
+<p-confirmdialog [style]="{ width: '550px' }" />

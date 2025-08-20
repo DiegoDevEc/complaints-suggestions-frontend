@@ -1,11 +1,12 @@
+import { Select } from 'primeng/select';
 import { Component, OnInit, signal, ViewChild } from '@angular/core';
-import { InputNumberModule } from "primeng/inputnumber";
-import { ButtonModule } from "primeng/button";
-import { Table, TableModule } from "primeng/table";
-import { IconFieldModule } from "primeng/iconfield";
-import { InputIconModule } from "primeng/inputicon";
-import { RatingModule } from "primeng/rating";
-import { TagModule } from "primeng/tag";
+import { InputNumberModule } from 'primeng/inputnumber';
+import { ButtonModule } from 'primeng/button';
+import { Table, TableModule } from 'primeng/table';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { RatingModule } from 'primeng/rating';
+import { TagModule } from 'primeng/tag';
 import { Product, ProductService } from '@/pages/service/product.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { CommonModule } from '@angular/common';
@@ -15,11 +16,10 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { RippleModule } from 'primeng/ripple';
-import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
-import { ComplaintsService, Feedback } from '@/pages/service/complaints.service';
+import { ComplaintsService, Feedback, FeedbackStatus } from '@/pages/service/complaints.service';
 
 interface Column {
     field: string;
@@ -46,14 +46,14 @@ interface ExportColumn {
         RatingModule,
         InputTextModule,
         TextareaModule,
-        SelectModule,
         RadioButtonModule,
         InputNumberModule,
         DialogModule,
         TagModule,
         InputIconModule,
         IconFieldModule,
-        ConfirmDialogModule
+        ConfirmDialogModule,
+        Select
     ],
     templateUrl: './complaints.html',
     styleUrl: './complaints.scss',
@@ -71,7 +71,12 @@ export class Complaints implements OnInit {
 
     submitted: boolean = false;
 
-    statuses!: any[];
+    statuses: { label: string; value: FeedbackStatus }[] = [
+        { value: 'PENDING', label: 'Pendiente' },
+        { value: 'RESOLVED', label: 'Resuelto' },
+        { value: 'IN_PROGRESS', label: 'En progreso' },
+        { value: 'CANCEL', label: 'Cancelado' }
+    ];
 
     @ViewChild('dt') dt!: Table;
 
@@ -84,7 +89,7 @@ export class Complaints implements OnInit {
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
         private complaintsService: ComplaintsService
-    ) { }
+    ) {}
 
     ngOnInit() {
         this.loadData();
@@ -94,7 +99,6 @@ export class Complaints implements OnInit {
         this.complaintsService.getComplaints().subscribe((response) => {
             console.log('Complaints loaded:', response.data);
             this.complaints.set(response.data);
-
         });
     }
 
@@ -102,12 +106,10 @@ export class Complaints implements OnInit {
         table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
     }
 
-
     editComplaints(feedback: Feedback) {
         this.feedback = { ...feedback };
         this.complaintsDialog = true;
     }
-
 
     hideDialog() {
         this.complaintsDialog = false;
@@ -115,8 +117,6 @@ export class Complaints implements OnInit {
     }
 
     cancelFeedback(feedback: Feedback) {
-        console.log('Cancel feedback:', feedback);
-
         this.confirmationService.confirm({
             message: 'Esta seguro de cancelar la queja:  ' + feedback.description + '?',
             header: 'Confirmar',
@@ -136,16 +136,14 @@ export class Complaints implements OnInit {
         });
     }
 
-    getSeverity(status: string) {
+    getSeverity(status: FeedbackStatus) {
         switch (status) {
             case 'PENDING':
                 return 'warn';
             case 'RESOLVED':
                 return 'success';
             case 'IN_PROGRESS':
-                return 'warn';
-            case 'CANCEL':
-                return 'danger';
+                return 'info';
             default:
                 return 'info';
         }
@@ -153,32 +151,20 @@ export class Complaints implements OnInit {
 
     saveFeedback() {
         this.submitted = true;
-        let _products = this.complaints();
-        /*if (this.product.name?.trim()) {
-            if (this.product.id) {
-                _products[this.findIndexById(this.product.id)] = this.product;
-                this.products.set([..._products]);
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Updated',
-                    life: 3000
-                });
-            } else {
-                this.product.id = this.createId();
-                this.product.image = 'product-placeholder.svg';
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Created',
-                    life: 3000
-                });
-                this.products.set([..._products, this.product]);
-            }
+       // const updated = this.complaints().map((c) => (c._id === this.feedback._id ? { ...c, status: this.feedback.status } : c));
+       // this.complaints.set(updated);
+       this.complaintsService.updateFeedback(this.feedback).subscribe(() => {
+            this.loadData();
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Successful',
+                detail: 'Queja actualizada',
+                life: 3000
+       })
+        });
+        this.submitted = false;
+        this.feedback = {} as Feedback;
 
-
-            this.product = {};
-        }*/
         this.complaintsDialog = false;
     }
 }
