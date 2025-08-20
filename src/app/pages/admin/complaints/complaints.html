@@ -1,7 +1,18 @@
-<p-table #dt [value]="complaints()" [rows]="10" [columns]="cols" [paginator]="true" [globalFilterFields]="['status']"
-    [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="selectedProducts" [rowHover]="true" dataKey="id"
-    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} quejas" [showCurrentPageReport]="true"
-    [rowsPerPageOptions]="[10, 20, 30]">
+<p-table
+    #dt
+    [value]="complaints()"
+    [rows]="10"
+    [columns]="cols"
+    [paginator]="true"
+    [globalFilterFields]="['status']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [(selection)]="selectedProducts"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} quejas"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 20, 30]"
+>
     <ng-template #caption>
         <div class="flex items-center justify-between">
             <h5 class="m-0">Quejas Ciudadanas</h5>
@@ -13,21 +24,11 @@
     </ng-template>
     <ng-template #header>
         <tr>
-            <th pSortableColumn="name" style="min-width:16rem">
-                Nombre
-            </th>
-            <th pSortableColumn="category" style="min-width:10rem">
-                Apellido
-            </th>
-            <th pSortableColumn="category" style="min-width:10rem">
-                Teléfono
-            </th>
-            <th pSortableColumn="category" style="min-width:10rem">
-                Email
-            </th>
-            <th pSortableColumn="inventoryStatus" style="min-width: 12rem">
-                Estado
-            </th>
+            <th pSortableColumn="name" style="min-width: 16rem">Nombre</th>
+            <th pSortableColumn="category" style="min-width: 10rem">Apellido</th>
+            <th pSortableColumn="category" style="min-width: 10rem">Teléfono</th>
+            <th pSortableColumn="category" style="min-width: 10rem">Email</th>
+            <th pSortableColumn="inventoryStatus" style="min-width: 12rem">Estado</th>
             <th style="min-width: 12rem"></th>
         </tr>
     </ng-template>
@@ -41,10 +42,8 @@
                 <p-tag [value]="complaints.status" [severity]="getSeverity(complaints.status)" />
             </td>
             <td>
-                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                    (click)="editComplaints(complaints)" />
-                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                    (click)="cancelFeedback(complaints)" />
+                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editComplaints(complaints)" />
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="cancelFeedback(complaints)" />
             </td>
         </tr>
     </ng-template>
@@ -53,17 +52,18 @@
 <p-dialog [(visible)]="complaintsDialog" [style]="{ width: '450px' }" header="Detalle de la Queja" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
-
             <div>
                 <label for="name" class="block font-bold mb-3">Denunciante</label>
                 <input type="text" pInputText id="name" [(ngModel)]="feedback.firstName" required autofocus fluid />
             </div>
             <div>
                 <label for="description" class="block font-bold mb-3">Description</label>
-                <textarea id="description" pTextarea [(ngModel)]="feedback.description" required rows="3" cols="20"
-                    fluid></textarea>
+                <textarea id="description" pTextarea [(ngModel)]="feedback.description" required rows="3" cols="20" fluid></textarea>
             </div>
-
+            <div>
+                <label for="status" class="block font-bold mb-3">Estado</label>
+                <p-dropdown id="status" [(ngModel)]="feedback.status" [options]="statuses" optionLabel="label" optionValue="value" placeholder="Seleccione" fluid></p-dropdown>
+            </div>
         </div>
     </ng-template>
 
@@ -73,4 +73,4 @@
     </ng-template>
 </p-dialog>
 
- <p-confirmdialog [style]="{ width: '550px' }" />
+<p-confirmdialog [style]="{ width: '550px' }" />
