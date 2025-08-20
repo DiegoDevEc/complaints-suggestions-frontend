@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
+import { AuthService } from '@/services/auth.service';
 
 @Component({
     selector: 'app-login',
@@ -50,7 +51,7 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                             <div class="flex items-center justify-between mt-2 mb-8 gap-8">
                                 <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Olvidaste tu clave?</span>
                             </div>
-                            <p-button label="Ingresar" styleClass="w-full" routerLink="/"></p-button>
+                            <p-button label="Ingresar" styleClass="w-full" (click)="login()"></p-button>
                         </div>
                     </div>
                 </div>
@@ -64,4 +65,13 @@ export class Login {
     password: string = '';
 
     checked: boolean = false;
+
+    constructor(private auth: AuthService, private router: Router) { }
+
+    login() {
+        this.auth.login(this.email, this.password).subscribe({
+            next: () => this.router.navigateByUrl('/dashboard'),
+            error: (err) => console.error('Login error:', err)
+        });
+    }
 }
