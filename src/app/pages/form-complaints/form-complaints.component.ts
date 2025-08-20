@@ -35,9 +35,10 @@ export class FormComplaintsComponent {
 
 
     dropdownItems = [
-        { name: 'Option 1', code: 'Option 1' },
-        { name: 'Option 2', code: 'Option 2' },
-        { name: 'Option 3', code: 'Option 3' }
+        { name: 'Queja', code: 'COMPLAINT' },
+        { name: 'Denuncia', code: 'COMPLAINT' },
+        { name: 'Sugerencia', code: 'SUGGESTION' },
+        { name: 'Felicitación', code: 'COMPLIMENT' }
     ];
 
 }

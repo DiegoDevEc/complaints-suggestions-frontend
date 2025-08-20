@@ -30,6 +30,7 @@ export class AppMenu {
                     { label: 'Quejas', icon: 'pi pi-fw pi-id-card', routerLink: ['/complaints/complaints'] },
                   { label: 'Input', icon: 'pi pi-fw pi-check-square', routerLink: ['/uikit/input'] },
                   { label: 'Table', icon: 'pi pi-fw pi-table', routerLink: ['/uikit/table'] },
+                    { label: 'Menu', icon: 'pi pi-fw pi-bars', routerLink: ['/uikit/menu'] },
                    /*   { label: 'Button', icon: 'pi pi-fw pi-mobile', class: 'rotated-icon', routerLink: ['/uikit/button'] },
                     { label: 'Table', icon: 'pi pi-fw pi-table', routerLink: ['/uikit/table'] },
                     { label: 'List', icon: 'pi pi-fw pi-list', routerLink: ['/uikit/list'] },

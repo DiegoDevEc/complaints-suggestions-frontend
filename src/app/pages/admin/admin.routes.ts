@@ -1,8 +1,10 @@
 import { Routes } from '@angular/router';
 import { Complaints } from './complaints/complaints';
+import { MenuDemo } from '../uikit/menudemo';
 
 export default [
     { path: 'complaints', data: { breadcrumb: 'Quejas' }, component: Complaints },
+    { path: 'menu', data: { breadcrumb: 'Menu' }, component: MenuDemo },
     /*{ path: 'button', data: { breadcrumb: 'Button' }, component: ButtonDemo },
     { path: 'charts', data: { breadcrumb: 'Charts' }, component: ChartDemo },
     { path: 'file', data: { breadcrumb: 'File' }, component: FileDemo },
