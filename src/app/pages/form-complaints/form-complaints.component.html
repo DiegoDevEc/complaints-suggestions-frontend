@@ -5,56 +5,101 @@
 
         <p-fluid class="flex-1 overflow-auto">
             <div class="flex mt-8">
-                <div class="card flex flex-col gap-6 w-full">
+                <form [formGroup]="complaintForm" (ngSubmit)="onSubmit()" class="card flex flex-col gap-6 w-full">
                     <div class="font-semibold text-xl">Denuncias, Quejas o Sugerencias</div>
                     <div class="flex flex-col md:flex-row gap-6">
                         <div class="flex flex-wrap gap-2 w-full">
                             <label for="firstname">Nombres</label>
-                            <input pInputText id="firstname" type="text" />
+                            <input pInputText id="firstname" type="text" formControlName="firstName" />
+                            <small class="p-error" *ngIf="complaintForm.get('firstName')?.invalid && (complaintForm.get('firstName')?.touched || submitted)">
+                                El nombre es obligatorio
+                            </small>
                         </div>
                         <div class="flex flex-wrap gap-2 w-full">
                             <label for="lastname">Apellidos</label>
-                            <input pInputText id="lastname" type="text" />
+                            <input pInputText id="lastname" type="text" formControlName="lastName" />
+                            <small class="p-error" *ngIf="complaintForm.get('lastName')?.invalid && (complaintForm.get('lastName')?.touched || submitted)">
+                                El apellido es obligatorio
+                            </small>
                         </div>
                     </div>
                     <div class="flex flex-col md:flex-row gap-6">
                         <div class="flex flex-wrap gap-2 w-full">
                             <label for="email">Email</label>
-                            <input pInputText id="email" type="text" />
+                            <input pInputText id="email" type="text" formControlName="email" />
+                            <small class="p-error" *ngIf="complaintForm.get('email')?.errors?.['required'] && (complaintForm.get('email')?.touched || submitted)">
+                                El email es obligatorio
+                            </small>
+                            <small class="p-error" *ngIf="complaintForm.get('email')?.errors?.['email'] && (complaintForm.get('email')?.touched || submitted)">
+                                Email inválido
+                            </small>
                         </div>
                         <div class="flex flex-wrap gap-2 w-full">
                             <label for="phone">Teléfono</label>
-                            <input pInputText id="phone" type="text" />
+                            <input pInputText id="phone" type="text" formControlName="phone" />
+                            <small class="p-error" *ngIf="complaintForm.get('phone')?.invalid && (complaintForm.get('phone')?.touched || submitted)">
+                                El teléfono es obligatorio
+                            </small>
                         </div>
                     </div>
 
                     <div class="flex flex-col md:flex-row gap-6">
                         <div class="flex flex-wrap gap-2 w-full">
-                            <label for="state">Tipo</label>
-                            <p-select id="state" [(ngModel)]="dropdownItem" [options]="dropdownItems" optionLabel="name"
-                                placeholder="Seleccione uno" class="w-full"></p-select>
+                            <label for="type">Tipo</label>
+                            <p-select id="type" formControlName="type" [options]="dropdownItems" optionLabel="name"
+                                optionValue="code" placeholder="Seleccione uno" class="w-full"></p-select>
+                            <small class="p-error" *ngIf="complaintForm.get('type')?.invalid && (complaintForm.get('type')?.touched || submitted)">
+                                El tipo es obligatorio
+                            </small>
                         </div>
 
-
                         <div class="flex items-center flex-wrap gap-2 w-full">
-                            <p-checkbox id="checkOption3" name="option" value="true" [(ngModel)]="checkboxValue" />
-                            <label for="checkOption3" class="ml-2">Contactar</label>
+                            <p-checkbox id="contacted" binary="true" formControlName="contacted"></p-checkbox>
+                            <label for="contacted" class="ml-2">Contactar</label>
+                            <small class="p-error" *ngIf="complaintForm.get('contacted')?.invalid && (complaintForm.get('contacted')?.touched || submitted)">
+                                Debe aceptar ser contactado
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="flex flex-wrap gap-2 w-full">
+                            <label for="latitude">Latitud</label>
+                            <input pInputText id="latitude" type="text" formControlName="latitude" readonly />
+                            <small class="p-error" *ngIf="complaintForm.get('latitude')?.invalid && submitted">
+                                La latitud es obligatoria
+                            </small>
+                        </div>
+                        <div class="flex flex-wrap gap-2 w-full">
+                            <label for="longitude">Longitud</label>
+                            <input pInputText id="longitude" type="text" formControlName="longitude" readonly />
+                            <small class="p-error" *ngIf="complaintForm.get('longitude')?.invalid && submitted">
+                                La longitud es obligatoria
+                            </small>
                         </div>
                     </div>
 
                     <div class="flex flex-wrap">
                         <label for="description">Descripción</label>
-                        <textarea pTextarea id="description" rows="4"></textarea>
+                        <textarea pTextarea id="description" rows="4" formControlName="description"></textarea>
+                        <small class="p-error" *ngIf="complaintForm.get('description')?.invalid && (complaintForm.get('description')?.touched || submitted)">
+                            La descripción es obligatoria
+                        </small>
                     </div>
 
-
-                    <!--div class="flex flex-wrap">
-                        <google-map class="full-map" [center]="center" [zoom]="zoom">
+                    <div class="flex flex-wrap">
+                        <google-map class="full-map" [center]="center" [zoom]="zoom" (mapClick)="setMarker($event)">
+                            <map-marker *ngIf="selectedPosition" [position]="selectedPosition"></map-marker>
                         </google-map>
-                    </div-->
-                </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button pButton type="submit" label="Enviar"></button>
+                    </div>
+                </form>
             </div>
         </p-fluid>
+        <p-toast></p-toast>
 
     </div>
 </div>
