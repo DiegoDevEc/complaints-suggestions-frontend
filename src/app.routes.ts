@@ -13,6 +13,7 @@ export const appRoutes: Routes = [
         canActivate: [authGuard],
         children: [
             { path: 'dashboard', component: Dashboard },
+            { path: 'complaints', loadChildren: () => import('./app/pages/admin/admin.routes') },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
         ]
