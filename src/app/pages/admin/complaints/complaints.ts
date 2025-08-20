@@ -1,3 +1,4 @@
+import { Select } from 'primeng/select';
 import { Component, OnInit, signal, ViewChild } from '@angular/core';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ButtonModule } from 'primeng/button';
@@ -15,7 +16,6 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { RippleModule } from 'primeng/ripple';
-import { DropdownModule } from 'primeng/dropdown';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
@@ -46,14 +46,14 @@ interface ExportColumn {
         RatingModule,
         InputTextModule,
         TextareaModule,
-        DropdownModule,
         RadioButtonModule,
         InputNumberModule,
         DialogModule,
         TagModule,
         InputIconModule,
         IconFieldModule,
-        ConfirmDialogModule
+        ConfirmDialogModule,
+        Select
     ],
     templateUrl: './complaints.html',
     styleUrl: './complaints.scss',
@@ -74,7 +74,8 @@ export class Complaints implements OnInit {
     statuses: { label: string; value: FeedbackStatus }[] = [
         { value: 'PENDING', label: 'Pendiente' },
         { value: 'RESOLVED', label: 'Resuelto' },
-        { value: 'IN_PROGRESS', label: 'En progreso' }
+        { value: 'IN_PROGRESS', label: 'En progreso' },
+        { value: 'CANCEL', label: 'Cancelado' }
     ];
 
     @ViewChild('dt') dt!: Table;
@@ -116,8 +117,6 @@ export class Complaints implements OnInit {
     }
 
     cancelFeedback(feedback: Feedback) {
-        console.log('Cancel feedback:', feedback);
-
         this.confirmationService.confirm({
             message: 'Esta seguro de cancelar la queja:  ' + feedback.description + '?',
             header: 'Confirmar',
@@ -152,8 +151,20 @@ export class Complaints implements OnInit {
 
     saveFeedback() {
         this.submitted = true;
-        const updated = this.complaints().map((c) => (c._id === this.feedback._id ? { ...c, status: this.feedback.status } : c));
-        this.complaints.set(updated);
+       // const updated = this.complaints().map((c) => (c._id === this.feedback._id ? { ...c, status: this.feedback.status } : c));
+       // this.complaints.set(updated);
+       this.complaintsService.updateFeedback(this.feedback).subscribe(() => {
+            this.loadData();
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Successful',
+                detail: 'Queja actualizada',
+                life: 3000
+       })
+        });
+        this.submitted = false;
+        this.feedback = {} as Feedback;
+
         this.complaintsDialog = false;
     }
 }

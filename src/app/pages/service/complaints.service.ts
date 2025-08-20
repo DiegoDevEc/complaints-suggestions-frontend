@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 
-export type FeedbackStatus = 'PENDING' | 'RESOLVED' | 'IN_PROGRESS';
+export type FeedbackStatus = 'PENDING' | 'RESOLVED' | 'IN_PROGRESS' | 'CANCEL';
 export type FeedbackType = 'complaint' | 'compliment' | 'suggestion';
 
 export interface Feedback {
@@ -41,5 +41,10 @@ export class ComplaintsService {
     cancelFeedback(feedbackId: string) {
         console.log('Cancelling feedback with ID:', feedbackId);
         return this.http.delete(`${this.apiUrl}/private/feedback/${feedbackId}`);
+    }
+    updateFeedback(feedback: Feedback) {
+        console.log('Updating feedback:', feedback);
+        let statusFeedback = { status: feedback.status };
+        return this.http.patch(`${this.apiUrl}/private/feedback/${feedback._id}/status`, statusFeedback);
     }
 }

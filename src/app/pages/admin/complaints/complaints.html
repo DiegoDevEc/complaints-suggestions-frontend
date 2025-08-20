@@ -1,18 +1,7 @@
-<p-table
-    #dt
-    [value]="complaints()"
-    [rows]="10"
-    [columns]="cols"
-    [paginator]="true"
-    [globalFilterFields]="['status']"
-    [tableStyle]="{ 'min-width': '75rem' }"
-    [(selection)]="selectedProducts"
-    [rowHover]="true"
-    dataKey="id"
-    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} quejas"
-    [showCurrentPageReport]="true"
-    [rowsPerPageOptions]="[10, 20, 30]"
->
+<p-table #dt [value]="complaints()" [rows]="10" [columns]="cols" [paginator]="true" [globalFilterFields]="['status']"
+    [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="selectedProducts" [rowHover]="true" dataKey="id"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} quejas" [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 20, 30]">
     <ng-template #caption>
         <div class="flex items-center justify-between">
             <h5 class="m-0">Quejas Ciudadanas</h5>
@@ -42,8 +31,10 @@
                 <p-tag [value]="complaints.status" [severity]="getSeverity(complaints.status)" />
             </td>
             <td>
-                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editComplaints(complaints)" />
-                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="cancelFeedback(complaints)" />
+                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                    (click)="editComplaints(complaints)" />
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                    (click)="cancelFeedback(complaints)" />
             </td>
         </tr>
     </ng-template>
@@ -58,12 +49,17 @@
             </div>
             <div>
                 <label for="description" class="block font-bold mb-3">Description</label>
-                <textarea id="description" pTextarea [(ngModel)]="feedback.description" required rows="3" cols="20" fluid></textarea>
+                <textarea id="description" pTextarea [(ngModel)]="feedback.description" required rows="3" cols="20"
+                    fluid></textarea>
             </div>
+
             <div>
                 <label for="status" class="block font-bold mb-3">Estado</label>
-                <p-dropdown id="status" [(ngModel)]="feedback.status" [options]="statuses" optionLabel="label" optionValue="value" placeholder="Seleccione" fluid></p-dropdown>
+                <p-select inputId="status" [(ngModel)]="feedback.status" [options]="statuses" optionLabel="label"
+                    optionValue="value" placeholder="Seleccione" class="w-full" />
             </div>
+
+
         </div>
     </ng-template>
 
