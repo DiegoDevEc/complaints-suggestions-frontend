@@ -15,10 +15,12 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
 import { ComplaintsService } from '../service/complaints.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-form-complaints',
     imports: [
+        CommonModule,
         RouterModule,
         TopbarWidget,
         RippleModule,
@@ -44,8 +46,8 @@ export class FormComplaintsComponent implements OnInit {
     complaintForm!: FormGroup;
     submitted = false;
 
-    center: google.maps.LatLngLiteral = { lat: 40.73061, lng: -73.935242 };
-    zoom = 10;
+    center: google.maps.LatLngLiteral = null!;
+    zoom = 20;
     selectedPosition: google.maps.LatLngLiteral | null = null;
 
     dropdownItems = [
@@ -58,7 +60,7 @@ export class FormComplaintsComponent implements OnInit {
         private fb: FormBuilder,
         private complaintsService: ComplaintsService,
         private messageService: MessageService
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.complaintForm = this.fb.group({
@@ -75,20 +77,66 @@ export class FormComplaintsComponent implements OnInit {
     }
 
     setMarker(event: google.maps.MapMouseEvent) {
-        if (event.latLng) {
-            this.selectedPosition = {
-                lat: event.latLng.lat(),
-                lng: event.latLng.lng()
-            };
-            this.complaintForm.patchValue({
-                latitude: this.selectedPosition.lat,
-                longitude: this.selectedPosition.lng
-            });
-        }
+        if (!event.latLng) return;
+        this.selectedPosition = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+        this.complaintForm.patchValue({
+            latitude: this.selectedPosition.lat,
+            longitude: this.selectedPosition.lng
+        });
     }
+
+    requestUserLocation() {
+        if (!('geolocation' in navigator)) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Geolocalización no soportada',
+                detail: 'Tu navegador no soporta geolocalización.'
+            });
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                this.center = { lat: latitude, lng: longitude };
+                this.zoom = 20;
+                this.selectedPosition = { lat: latitude, lng: longitude };
+                this.complaintForm.patchValue({ latitude, longitude });
+
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Ubicación obtenida',
+                    detail: 'Puedes mover el marcador para ajustar el punto.'
+                });
+            },
+            (error) => {
+                let detail = 'No se pudo obtener la ubicación del dispositivo.';
+                if (error.code === error.PERMISSION_DENIED) {
+                    detail = 'Permiso denegado. Selecciona un punto en el mapa.';
+                }
+                this.messageService.add({
+                    severity: 'warn',
+                    summary: 'Ubicación no disponible',
+                    detail
+                });
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+    }
+
 
     onSubmit() {
         this.submitted = true;
+
+        if (!this.complaintForm.value.latitude || !this.complaintForm.value.longitude) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Falta ubicación',
+                detail: 'Haz clic en "Usar mi ubicación" o selecciona un punto en el mapa.'
+            });
+            return;
+        }
+
         if (this.complaintForm.invalid) {
             this.complaintForm.markAllAsTouched();
             return;

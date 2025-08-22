@@ -1,4 +1,101 @@
-.full-map {
-  width: 100% !important;
-  height: 500px;
+.p-error{
+    color: red;
 }
+/* --- Fixes generales para móvil --- */
+:host {
+  display: block;
+  /* Evita scroll horizontal del componente en móvil */
+  overflow-x: hidden;
+}
+
+/* Asegura que padding + border se midan dentro del ancho */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Página y tarjeta: sin desbordes laterales */
+.page {
+  width: 100%;
+  overflow-x: hidden;            /* clave para cortar cualquier spill */
+  padding-inline: 12px;          /* un poco de respiro en móvil */
+}
+
+.card {
+  width: 100%;
+  max-width: 1200px;          /* más ancho que antes */
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
+  padding: 2rem;              /* más aire */
+  margin: 2rem auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,.08); /* sombra más marcada */
+  transition: box-shadow .3s ease;
+}
+.card:hover {
+  box-shadow: 0 12px 32px rgba(0,0,0,.12); /* efecto ligero al pasar el mouse */
+}
+
+/* Grid: define 1 columna en móvil para que nada empuje el ancho */
+.grid { display: grid; grid-template-columns: 1fr; }
+.col-12 { grid-column: 1 / -1; min-width: 0; }  /* min-width:0 evita overflow dentro de grid */
+
+/* En >=768px volvemos a 12 columnas y 2 col de 6 */
+@media (min-width: 768px) {
+  .grid { grid-template-columns: repeat(12, 1fr); }
+  .md\:col-6 { grid-column: span 6; min-width: 0; }
+}
+
+/* Fila del botón: que pueda partir línea si no cabe */
+.row { display: flex; gap: .75rem; align-items: center; }
+.between { justify-content: space-between; flex-wrap: wrap; }
+
+/* Botón: que no obligue un ancho mayor al viewport */
+:host ::ng-deep .p-button {
+  border-radius: 9999px;
+  max-width: 100%;
+  white-space: nowrap;           /* mantiene etiqueta, pero… */
+}
+
+/* Layout desktop: formulario más ancho que el mapa */
+@media (min-width: 992px) {
+  .grid {
+    grid-template-columns: repeat(12, 1fr);
+    gap: 2rem;
+  }
+  .col-12.md\:col-6:first-child { grid-column: span 5; }  /* mapa */
+  .col-12.md\:col-6:last-child  { grid-column: span 7; }  /* formulario */
+}
+
+/* En pantallas estrechas, deja el botón a 100% para evitar overflow */
+@media (max-width: 420px) {
+  :host ::ng-deep .p-button { width: 100%; }
+}
+
+/* Mapa: que no empuje el ancho y siempre se recorte dentro de su contenedor */
+.map {
+  width: 100%;
+  height: 420px;
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  overflow: hidden;              /* recorta controles del mapa si se salen */
+  min-width: 0;                  /* importante para grid/flex */
+  google-map { display: block; width: 100%; height: 100%; }
+}
+@media (min-width: 992px) { .map { height: 500px; } }
+
+/* Inputs, selects, textarea a 100% */
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-textarea,
+:host ::ng-deep .p-dropdown { width: 100%; }
+
+/* Tipografía de errores */
+:host ::ng-deep .p-error { font-size: .8rem; }
+
+/* Título y cabecera más compactos en móvil */
+.title {
+  margin: 0 0 1.5rem 0;
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  font-weight: 700;
+  color: var(--text-color);
+}
+.muted { opacity: .75; }
+
+
