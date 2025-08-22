@@ -1,7 +1,6 @@
 <div class="bg-surface-0 dark:bg-surface-900 min-h-screen">
     <div id="home" class="landing-wrapper overflow-hidden">
-        <topbar-widget
-            class="py-6 px-6 mx-0 md:mx-12 lg:mx-20 lg:px-20 flex items-center justify-between relative lg:static" />
+        <topbar-widget class="py-6 px-6 mx-0 md:mx-12 lg:mx-20 lg:px-20 flex items-center justify-between relative lg:static" />
 
         <p-fluid class="flex-1 overflow-auto">
             <div class="flex mt-8">
@@ -30,11 +29,31 @@
 
                     <div class="flex flex-col md:flex-row gap-6">
                         <div class="flex flex-wrap gap-2 w-full">
-                            <label for="state">Tipo</label>
-                            <p-select id="state" [(ngModel)]="dropdownItem" [options]="dropdownItems" optionLabel="name"
-                                placeholder="Seleccione uno" class="w-full"></p-select>
+                            <label for="mainStreet">Calle A</label>
+                            <input pInputText id="mainStreet" type="text" [(ngModel)]="mainStreet" />
                         </div>
+                        <div class="flex flex-wrap gap-2 w-full">
+                            <label for="crossStreet">Calle B</label>
+                            <input pInputText id="crossStreet" type="text" [(ngModel)]="crossStreet" />
+                        </div>
+                    </div>
 
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="flex flex-wrap gap-2 w-full">
+                            <label for="latitude">Latitud</label>
+                            <input pInputText id="latitude" type="text" [(ngModel)]="latitude" readonly />
+                        </div>
+                        <div class="flex flex-wrap gap-2 w-full">
+                            <label for="longitude">Longitud</label>
+                            <input pInputText id="longitude" type="text" [(ngModel)]="longitude" readonly />
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="flex flex-wrap gap-2 w-full">
+                            <label for="state">Tipo</label>
+                            <p-select id="state" [(ngModel)]="dropdownItem" [options]="dropdownItems" optionLabel="name" placeholder="Seleccione uno" class="w-full"></p-select>
+                        </div>
 
                         <div class="flex items-center flex-wrap gap-2 w-full">
                             <p-checkbox id="checkOption3" name="option" value="true" [(ngModel)]="checkboxValue" />
@@ -46,15 +65,13 @@
                         <label for="description">Descripción</label>
                         <textarea pTextarea id="description" rows="4"></textarea>
                     </div>
-
-
-                    <!--div class="flex flex-wrap">
-                        <google-map class="full-map" [center]="center" [zoom]="zoom">
+                    <div class="flex flex-wrap">
+                        <google-map class="full-map" [center]="center" [zoom]="zoom" (mapClick)="onMapClick($event)">
+                            <map-marker *ngIf="marker" [position]="marker"></map-marker>
                         </google-map>
-                    </div-->
+                    </div>
                 </div>
             </div>
         </p-fluid>
-
     </div>
 </div>

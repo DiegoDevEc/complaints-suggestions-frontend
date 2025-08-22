@@ -8,4 +8,6 @@ export interface CreateFeedback {
     contacted: boolean;
     latitude: number;
     longitude: number;
+    mainStreet: string;
+    crossStreet: string;
 }
