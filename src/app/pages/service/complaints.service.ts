@@ -38,6 +38,10 @@ export class ComplaintsService {
         return this.http.get<FeedbackListResponse>(`${this.apiUrl}/private/feedback?page=1&limit=10`);
     }
 
+    createComplaint(payload: Omit<Feedback, '_id' | 'status' | 'dateRegister' | '__v'>) {
+        return this.http.post(`${this.apiUrl}/public/feedback`, payload);
+    }
+
     cancelFeedback(feedbackId: string) {
         console.log('Cancelling feedback with ID:', feedbackId);
         return this.http.delete(`${this.apiUrl}/private/feedback/${feedbackId}`);
