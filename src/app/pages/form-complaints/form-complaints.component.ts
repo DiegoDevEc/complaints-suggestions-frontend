@@ -16,6 +16,7 @@ import { ComplaintsService } from '../service/complaints.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { CommonModule } from '@angular/common';
+import { GeocodingService } from '../service/geocoding.service';
 
 @Component({
     selector: 'app-form-complaints',
@@ -46,9 +47,22 @@ export class FormComplaintsComponent implements OnInit {
     complaintForm!: FormGroup;
     submitted = false;
 
-    center: google.maps.LatLngLiteral = null!;
-    zoom = 20;
+    center: google.maps.LatLngLiteral | null = null;
+    zoom = 18;
     selectedPosition: google.maps.LatLngLiteral | null = null;
+
+    mapOptions: google.maps.MapOptions = {
+        disableDefaultUI: false,
+        clickableIcons: false,
+        zoomControl: true,
+        streetViewControl: false
+    };
+
+    markerOptions: google.maps.MarkerOptions = {
+        draggable: true
+    };
+
+    private geocoder = new google.maps.Geocoder();
 
     dropdownItems = [
         { name: 'Queja', code: 'complaint' },
@@ -59,7 +73,8 @@ export class FormComplaintsComponent implements OnInit {
     constructor(
         private fb: FormBuilder,
         private complaintsService: ComplaintsService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private geocodingService: GeocodingService
     ) { }
 
     ngOnInit() {
@@ -70,22 +85,96 @@ export class FormComplaintsComponent implements OnInit {
             description: ['', Validators.required],
             phone: ['', Validators.required],
             type: ['', Validators.required],
-            contacted: [false, Validators.requiredTrue],
+            contacted: [true, Validators.requiredTrue],
             latitude: ['', Validators.required],
-            longitude: ['', Validators.required]
+            longitude: ['', Validators.required],
+            // Opcional si harás reverse geocoding:
+            address: ['']
         });
+        // Prevenir errores por contexto inseguro (HTTP)
+        if (!isSecureContext) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Sitio no seguro',
+                detail: 'La geolocalización requiere HTTPS o localhost. Puedes seleccionar el punto manualmente.'
+            });
+        }
     }
 
     setMarker(event: google.maps.MapMouseEvent) {
         if (!event.latLng) return;
-        this.selectedPosition = { lat: event.latLng.lat(), lng: event.latLng.lng() };
-        this.complaintForm.patchValue({
-            latitude: this.selectedPosition.lat,
-            longitude: this.selectedPosition.lng
+        const lat = event.latLng.lat();
+        const lng = event.latLng.lng();
+        this.selectedPosition = { lat, lng };
+        this.complaintForm.patchValue({ latitude: lat, longitude: lng });
+
+        this.geocodingService.reverseGeocodeToString(lat, lng)
+            .subscribe(dir => {
+                console.log("extrayendo datos de geocoding");
+                // dir es UN SOLO string ya formateado
+                this.complaintForm.patchValue({ address: dir, latitud: lat, longitud: lng });
+            });
+        // (Opcional) reverse geocoding al hacer click:
+        this.reverseGeocode(lat, lng);
+    }
+
+    onMarkerDragEnd(event: google.maps.MapMouseEvent) {
+        if (!event.latLng) return;
+        const lat = event.latLng.lat();
+        const lng = event.latLng.lng();
+        this.selectedPosition = { lat, lng };
+        this.complaintForm.patchValue({ latitude: lat, longitude: lng });
+        this.geocodingService.reverseGeocodeToString(lat, lng)
+            .subscribe(dir => {
+                console.log("extrayendo datos de geocoding");
+                // dir es UN SOLO string ya formateado
+                this.complaintForm.patchValue({ address: dir, latitud: lat, longitud: lng });
+            });
+        this.reverseGeocode(lat, lng);
+    }
+
+    private reverseGeocode(lat: number, lng: number) {
+        this.geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+            if (status !== 'OK' || !results?.length) return;
+            const first = results[0];
+            const address = first.formatted_address;
+
+            // Intenta extraer dos calles si están en address_components
+            const route = first.address_components?.find(c => c.types.includes('route'))?.long_name || '';
+            const neighborhood = first.address_components?.find(c => c.types.includes('sublocality') || c.types.includes('neighborhood'))?.long_name || '';
+            // Heurística simple: streetA = route; streetB = neighborhood/otro
+            const streetA = route;
+            const streetB = neighborhood;
+
+            this.complaintForm.patchValue({
+                addressLine: address,
+                streetA,
+                streetB
+            });
         });
     }
 
-    requestUserLocation() {
+    private getCurrentPositionOnce(timeout = 10000): Promise<GeolocationPosition> {
+        return new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                enableHighAccuracy: true,
+                timeout,
+                maximumAge: 0
+            });
+        });
+    }
+
+    private async checkGeoPermission(): Promise<PermissionState | 'unknown'> {
+        if (!('permissions' in navigator) || !(navigator as any).permissions?.query) return 'unknown';
+        try {
+            const status = await (navigator as any).permissions.query({ name: 'geolocation' as PermissionName });
+            return status.state; // 'granted' | 'prompt' | 'denied'
+        } catch {
+            return 'unknown';
+        }
+    }
+
+    async requestUserLocation() {
         if (!('geolocation' in navigator)) {
             this.messageService.add({
                 severity: 'error',
@@ -94,41 +183,85 @@ export class FormComplaintsComponent implements OnInit {
             });
             return;
         }
+        if (!isSecureContext) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'HTTPS requerido',
+                detail: 'Activa HTTPS o usa localhost para obtener la ubicación automáticamente.'
+            });
+            return;
+        }
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude } = position.coords;
+        const perm = await this.checkGeoPermission();
+        if (perm === 'denied') {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Permiso denegado',
+                detail: 'Activa el permiso de ubicación en el navegador o selecciona un punto en el mapa.'
+            });
+            return;
+        }
+
+        // Reintentos en POSITION_UNAVAILABLE (p.ej. kCLErrorLocationUnknown)
+        const maxRetries = 2;
+        let attempt = 0;
+        while (attempt <= maxRetries) {
+            try {
+                const pos = await this.getCurrentPositionOnce(10000);
+                const { latitude, longitude } = pos.coords;
                 this.center = { lat: latitude, lng: longitude };
-                this.zoom = 20;
+                this.zoom = 18;
                 this.selectedPosition = { lat: latitude, lng: longitude };
                 this.complaintForm.patchValue({ latitude, longitude });
+
+                this.geocodingService.reverseGeocodeToString(latitude, longitude)
+                    .subscribe(dir => {
+                        console.log("extrayendo datos de geocoding");
+
+                        // dir es UN SOLO string ya formateado
+                        this.complaintForm.patchValue({ address: dir, latitud: latitude, longitud: longitude });
+                    });
 
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Ubicación obtenida',
                     detail: 'Puedes mover el marcador para ajustar el punto.'
                 });
-            },
-            (error) => {
-                let detail = 'No se pudo obtener la ubicación del dispositivo.';
-                if (error.code === error.PERMISSION_DENIED) {
-                    detail = 'Permiso denegado. Selecciona un punto en el mapa.';
+                // (Opcional) reverse geocoding automático al obtener la ubicación
+                this.reverseGeocode(latitude, longitude);
+                return;
+            } catch (err: any) {
+                if (err?.code === err?.PERMISSION_DENIED) {
+                    this.messageService.add({
+                        severity: 'warn',
+                        summary: 'Permiso denegado',
+                        detail: 'Autoriza la ubicación en el candado del navegador o selecciona un punto en el mapa.'
+                    });
+                    return;
+                }
+                if (err?.code === err?.POSITION_UNAVAILABLE && attempt < maxRetries) {
+                    // Espera breve y reintenta
+                    await new Promise(r => setTimeout(r, 1500));
+                    attempt++;
+                    continue;
                 }
                 this.messageService.add({
                     severity: 'warn',
                     summary: 'Ubicación no disponible',
-                    detail
+                    detail: 'No se pudo obtener la ubicación del dispositivo. Selecciona un punto en el mapa.'
                 });
-            },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-        );
+                return;
+            }
+        }
     }
 
-
     onSubmit() {
+        console.log("enviando formulario");
+
         this.submitted = true;
 
-        if (!this.complaintForm.value.latitude || !this.complaintForm.value.longitude) {
+        const { latitude, longitude } = this.complaintForm.value;
+        if (!latitude || !longitude) {
             this.messageService.add({
                 severity: 'warn',
                 summary: 'Falta ubicación',
@@ -137,10 +270,18 @@ export class FormComplaintsComponent implements OnInit {
             return;
         }
 
+        console.log("enviando formulario2");
+        console.log(this.complaintForm.value);
+
+
         if (this.complaintForm.invalid) {
+            console.log("formulario invalido rompe despues de 2");
+
             this.complaintForm.markAllAsTouched();
             return;
         }
+
+        console.log("enviando formulario3");
 
         this.complaintsService.createComplaint(this.complaintForm.value).subscribe({
             next: () => {
@@ -149,17 +290,21 @@ export class FormComplaintsComponent implements OnInit {
                     summary: 'Éxito',
                     detail: 'Formulario enviado correctamente'
                 });
+                //this.complaintForm.reset();
+                //this.ngOnInit();
                 this.complaintForm.reset();
+                this.complaintForm.controls['contacted'].setValue(true);
                 this.submitted = false;
                 this.selectedPosition = null;
             },
-            error: () => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'No se pudo enviar la información'
-                });
+            error: (err) => {
+                // Si tu backend responde 401, muéstralo claro
+                const msg = err?.status === 401
+                    ? 'No autorizado: inicia sesión para enviar el formulario.'
+                    : 'No se pudo enviar la información';
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
             }
         });
     }
+
 }

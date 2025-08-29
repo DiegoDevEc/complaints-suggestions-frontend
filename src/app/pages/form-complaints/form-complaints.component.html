@@ -81,16 +81,11 @@
                                     requerido</small>
                             </div>
 
-                            <div class="col-12">
-                                <p-checkbox inputId="contacted" binary="true" formControlName="contacted"
-                                    label="Acepto ser contactado para dar seguimiento"></p-checkbox>
-                                <small class="p-error block"
-                                    *ngIf="submitted && (complaintForm.get('contacted')?.hasError('requiredTrue'))">
-                                    Debes aceptar el contacto
-                                </small>
-                            </div>
-
                             <!-- Coordenadas solo lectura (ocúltalas si no quieres mostrarlas) -->
+                            <div class="col-12 md:col-12">
+                                <label for="address">Dirección</label>
+                                <input pInputText id="address" formControlName="address" />
+                            </div>
                             <div class="col-12 md:col-6">
                                 <label for="latitude">Latitud</label>
                                 <input pInputText id="latitude" formControlName="latitude" readonly />
