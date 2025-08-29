@@ -1,17 +1,14 @@
 <div class="bg-surface-0 dark:bg-surface-900 min-h-screen">
-    <topbar-widget
-        class="py-6 px-6 mx-0 md:mx-12 lg:mx-20 lg:px-20 flex items-center justify-between relative lg:static" />
+    <topbar-widget class="py-6 px-6 mx-0 md:mx-12 lg:mx-20 lg:px-20 flex items-center justify-between relative lg:static" />
 
     <div class="page">
-
         <div class="card">
             <h2 class="title">Denuncias, Quejas o Sugerencias</h2>
 
             <!-- Acciones -->
             <div class="row between center mb-3">
                 <small class="muted">Puedes hacer clic en el mapa o usar tu ubicación.</small>
-                <button pButton type="button" label="Usar mi ubicación" icon="pi pi-compass"
-                    (click)="requestUserLocation()"></button>
+                <button pButton type="button" label="Usar mi ubicación" icon="pi pi-compass" (click)="requestUserLocation()"></button>
             </div>
 
             <!-- Layout responsive: en móvil apila, en desktop 2 columnas -->
@@ -19,8 +16,7 @@
                 <!-- Columna mapa -->
                 <div class="col-12 md:col-6">
                     <div class="map">
-                        <google-map [center]="center || { lat: -0.1807, lng: -78.4678 }" [zoom]="zoom"
-                            (mapClick)="setMarker($event)">
+                        <google-map [center]="center || { lat: -0.1807, lng: -78.4678 }" [zoom]="zoom" (mapClick)="setMarker($event)">
                             <map-marker *ngIf="selectedPosition" [position]="selectedPosition"></map-marker>
                         </google-map>
                     </div>
@@ -33,61 +29,43 @@
                             <div class="col-12 md:col-6">
                                 <label for="firstName">Nombres</label>
                                 <input pInputText id="firstName" formControlName="firstName" />
-                                <small class="p-error"
-                                    *ngIf="submitted && complaintForm.get('firstName')?.invalid">Campo
-                                    requerido</small>
+                                <small class="p-error" *ngIf="submitted && complaintForm.get('firstName')?.invalid">Campo requerido</small>
                             </div>
 
                             <div class="col-12 md:col-6">
                                 <label for="lastName">Apellidos</label>
                                 <input pInputText id="lastName" formControlName="lastName" />
-                                <small class="p-error" *ngIf="submitted && complaintForm.get('lastName')?.invalid">Campo
-                                    requerido</small>
+                                <small class="p-error" *ngIf="submitted && complaintForm.get('lastName')?.invalid">Campo requerido</small>
                             </div>
 
                             <div class="col-12 md:col-6">
                                 <label for="email">Correo</label>
-                                <input pInputText id="email" type="email" placeholder="tucorreo@dominio.com"
-                                    formControlName="email" />
-                                <small class="p-error"
-                                    *ngIf="submitted && complaintForm.get('email')?.hasError('required')">Campo
-                                    requerido</small>
-                                <small class="p-error"
-                                    *ngIf="submitted && complaintForm.get('email')?.hasError('email')">Correo
-                                    inválido</small>
+                                <input pInputText id="email" type="email" placeholder="tucorreo@dominio.com" formControlName="email" />
+                                <small class="p-error" *ngIf="submitted && complaintForm.get('email')?.hasError('required')">Campo requerido</small>
+                                <small class="p-error" *ngIf="submitted && complaintForm.get('email')?.hasError('email')">Correo inválido</small>
                             </div>
 
                             <div class="col-12 md:col-6">
                                 <label for="phone">Teléfono</label>
                                 <input pInputText id="phone" formControlName="phone" />
-                                <small class="p-error" *ngIf="submitted && complaintForm.get('phone')?.invalid">Campo
-                                    requerido</small>
+                                <small class="p-error" *ngIf="submitted && complaintForm.get('phone')?.invalid">Campo requerido</small>
                             </div>
 
                             <div class="col-12">
                                 <label for="type">Tipo</label>
-                                <p-select id="type" formControlName="type" [options]="dropdownItems" optionLabel="name"
-                                    optionValue="code" placeholder="Selecciona un tipo"></p-select>
-                                <small class="p-error" *ngIf="submitted && complaintForm.get('type')?.invalid">Campo
-                                    requerido</small>
+                                <p-select id="type" formControlName="type" [options]="dropdownItems" optionLabel="name" optionValue="code" placeholder="Selecciona un tipo"></p-select>
+                                <small class="p-error" *ngIf="submitted && complaintForm.get('type')?.invalid">Campo requerido</small>
                             </div>
 
                             <div class="col-12">
                                 <label for="description">Descripción</label>
-                                <textarea pTextarea id="description" formControlName="description" rows="6"
-                                    [autoResize]="true"></textarea>
-                                <small class="p-error"
-                                    *ngIf="submitted && complaintForm.get('description')?.invalid">Campo
-                                    requerido</small>
+                                <textarea pTextarea id="description" formControlName="description" rows="6" [autoResize]="true"></textarea>
+                                <small class="p-error" *ngIf="submitted && complaintForm.get('description')?.invalid">Campo requerido</small>
                             </div>
 
                             <div class="col-12">
-                                <p-checkbox inputId="contacted" binary="true" formControlName="contacted"
-                                    label="Acepto ser contactado para dar seguimiento"></p-checkbox>
-                                <small class="p-error block"
-                                    *ngIf="submitted && (complaintForm.get('contacted')?.hasError('requiredTrue'))">
-                                    Debes aceptar el contacto
-                                </small>
+                                <p-checkbox inputId="contacted" binary="true" formControlName="contacted" label="Acepto ser contactado para dar seguimiento"></p-checkbox>
+                                <small class="p-error block" *ngIf="submitted && complaintForm.get('contacted')?.hasError('requiredTrue')"> Debes aceptar el contacto </small>
                             </div>
 
                             <!-- Coordenadas solo lectura (ocúltalas si no quieres mostrarlas) -->
@@ -99,11 +77,18 @@
                                 <label for="longitude">Longitud</label>
                                 <input pInputText id="longitude" formControlName="longitude" readonly />
                             </div>
+                            <div class="col-12 md:col-6">
+                                <label for="mainStreet">Calle principal</label>
+                                <input pInputText id="mainStreet" formControlName="mainStreet" readonly />
+                            </div>
+                            <div class="col-12 md:col-6">
+                                <label for="secondaryStreet">Calle secundaria</label>
+                                <input pInputText id="secondaryStreet" formControlName="secondaryStreet" readonly />
+                            </div>
                         </div>
 
                         <div class="row end mt-3">
-                            <button pButton type="submit" label="Enviar" icon="pi pi-send"
-                                class="p-button-rounded"></button>
+                            <button pButton type="submit" label="Enviar" icon="pi pi-send" class="p-button-rounded"></button>
                         </div>
                     </form>
                 </div>
@@ -112,6 +97,4 @@
 
         <p-toast></p-toast>
     </div>
-
-
 </div>

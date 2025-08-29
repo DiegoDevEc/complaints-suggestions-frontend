@@ -10,7 +10,7 @@ import { FluidModule } from 'primeng/fluid';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { CheckboxModule } from 'primeng/checkbox';
-import { GoogleMapsModule } from '@angular/google-maps';
+import { GoogleMapsModule, MapGeocoder } from '@angular/google-maps';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { ComplaintsService } from '../service/complaints.service';
 import { MessageService } from 'primeng/api';
@@ -19,30 +19,13 @@ import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-form-complaints',
-    imports: [
-        CommonModule,
-        RouterModule,
-        TopbarWidget,
-        RippleModule,
-        StyleClassModule,
-        ButtonModule,
-        DividerModule,
-        InputTextModule,
-        FluidModule,
-        SelectModule,
-        TextareaModule,
-        CheckboxModule,
-        GoogleMapsModule,
-        ReactiveFormsModule,
-        ToastModule
-    ],
+    imports: [CommonModule, RouterModule, TopbarWidget, RippleModule, StyleClassModule, ButtonModule, DividerModule, InputTextModule, FluidModule, SelectModule, TextareaModule, CheckboxModule, GoogleMapsModule, ReactiveFormsModule, ToastModule],
     standalone: true,
     templateUrl: './form-complaints.component.html',
     styleUrl: './form-complaints.component.scss',
     providers: [ComplaintsService, MessageService]
 })
 export class FormComplaintsComponent implements OnInit {
-
     complaintForm!: FormGroup;
     submitted = false;
 
@@ -59,8 +42,9 @@ export class FormComplaintsComponent implements OnInit {
     constructor(
         private fb: FormBuilder,
         private complaintsService: ComplaintsService,
-        private messageService: MessageService
-    ) { }
+        private messageService: MessageService,
+        private geocoder: MapGeocoder
+    ) {}
 
     ngOnInit() {
         this.complaintForm = this.fb.group({
@@ -72,7 +56,9 @@ export class FormComplaintsComponent implements OnInit {
             type: ['', Validators.required],
             contacted: [false, Validators.requiredTrue],
             latitude: ['', Validators.required],
-            longitude: ['', Validators.required]
+            longitude: ['', Validators.required],
+            mainStreet: [''],
+            secondaryStreet: ['']
         });
     }
 
@@ -83,6 +69,7 @@ export class FormComplaintsComponent implements OnInit {
             latitude: this.selectedPosition.lat,
             longitude: this.selectedPosition.lng
         });
+        this.reverseGeocode(this.selectedPosition.lat, this.selectedPosition.lng);
     }
 
     requestUserLocation() {
@@ -102,6 +89,7 @@ export class FormComplaintsComponent implements OnInit {
                 this.zoom = 20;
                 this.selectedPosition = { lat: latitude, lng: longitude };
                 this.complaintForm.patchValue({ latitude, longitude });
+                this.reverseGeocode(latitude, longitude);
 
                 this.messageService.add({
                     severity: 'success',
@@ -124,6 +112,19 @@ export class FormComplaintsComponent implements OnInit {
         );
     }
 
+    reverseGeocode(lat: number, lng: number) {
+        this.geocoder.geocode({ location: { lat, lng } }).subscribe(({ results }) => {
+            if (results.length) {
+                const first = results[0].formatted_address;
+                const intersection = first.split(',')[0];
+                const streets = intersection.split(/ y | & /i);
+                this.complaintForm.patchValue({
+                    mainStreet: streets[0]?.trim() || '',
+                    secondaryStreet: streets[1]?.trim() || ''
+                });
+            }
+        });
+    }
 
     onSubmit() {
         this.submitted = true;

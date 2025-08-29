@@ -17,6 +17,8 @@ export interface Feedback {
     contacted: boolean;
     latitude: number;
     longitude: number;
+    mainStreet?: string;
+    secondaryStreet?: string;
     dateRegister: string; // ISO 8601 string
     __v: number;
 }
