@@ -66,10 +66,13 @@ export class Login {
 
     checked: boolean = false;
 
-    constructor(private auth: AuthService, private router: Router) { }
+    constructor(
+        private auth: AuthService,
+        private router: Router
+    ) {}
 
     login() {
-        this.auth.login(this.email, this.password).subscribe({
+        this.auth.login({ email: this.email, password: this.password, remember: this.checked }).subscribe({
             next: () => this.router.navigateByUrl('/dashboard'),
             error: (err) => console.error('Login error:', err)
         });

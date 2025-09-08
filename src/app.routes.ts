@@ -4,9 +4,11 @@ import { Dashboard } from './app/pages/dashboard/dashboard';
 import { Notfound } from './app/pages/notfound/notfound';
 import { FormComplaintsComponent } from '@/pages/form-complaints/form-complaints.component';
 import { authGuard } from '@/guards/auth.guard';
+import { Login } from './app/pages/auth/login';
 
 export const appRoutes: Routes = [
     { path: '', component: FormComplaintsComponent },
+    { path: 'login', component: Login },
     {
         path: '',
         component: AppLayout,
