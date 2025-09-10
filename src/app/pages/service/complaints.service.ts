@@ -38,7 +38,7 @@ export class ComplaintsService {
         return this.http.get<FeedbackListResponse>(`${this.apiUrl}/private/feedback?page=1&limit=10`);
     }
 
-    createComplaint(payload: Omit<Feedback, '_id' | 'status' | 'dateRegister' | '__v'>) {
+    createComplaint(payload: FormData) {
         return this.http.post(`${this.apiUrl}/public/feedback`, payload);
     }
 

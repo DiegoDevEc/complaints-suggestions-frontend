@@ -44,6 +44,8 @@ import { GeocodingService } from '../service/geocoding.service';
 })
 export class FormComplaintsComponent implements OnInit {
 
+    previewUrl: string | null = null;
+
     complaintForm!: FormGroup;
     submitted = false;
 
@@ -83,6 +85,7 @@ export class FormComplaintsComponent implements OnInit {
             lastName: ['', Validators.required],
             email: ['', [Validators.required, Validators.email]],
             description: ['', Validators.required],
+            attachment: [null],
             phone: ['', Validators.required],
             type: ['', Validators.required],
             contacted: [true, Validators.requiredTrue],
@@ -153,6 +156,20 @@ export class FormComplaintsComponent implements OnInit {
             });
         });
     }
+
+    onFileSelected(event: Event) {
+        const input = event.target as HTMLInputElement;
+        const file = input.files && input.files.length ? input.files[0] : null;
+        if (file) {
+          // setea el archivo en el form
+          this.complaintForm.patchValue({ attachment: file });
+          this.complaintForm.get('attachment')?.updateValueAndValidity();
+      
+          // genera la vista previa
+          this.previewUrl && URL.revokeObjectURL(this.previewUrl); // liberar anterior
+          this.previewUrl = URL.createObjectURL(file);
+        }
+      }
 
     private getCurrentPositionOnce(timeout = 10000): Promise<GeolocationPosition> {
         return new Promise((resolve, reject) => {
@@ -283,7 +300,15 @@ export class FormComplaintsComponent implements OnInit {
 
         console.log("enviando formulario3");
 
-        this.complaintsService.createComplaint(this.complaintForm.value).subscribe({
+        const formData = new FormData();
+        Object.keys(this.complaintForm.controls).forEach(key => {
+            const value = this.complaintForm.get(key)?.value;
+            if (value !== null && value !== undefined) {
+                formData.append(key, value instanceof Blob ? value : String(value));
+            }
+        });
+
+        this.complaintsService.createComplaint(formData).subscribe({
             next: () => {
                 this.messageService.add({
                     severity: 'success',
@@ -296,6 +321,7 @@ export class FormComplaintsComponent implements OnInit {
                 this.complaintForm.controls['contacted'].setValue(true);
                 this.submitted = false;
                 this.selectedPosition = null;
+                this.previewUrl = null;
             },
             error: (err) => {
                 // Si tu backend responde 401, muéstralo claro
@@ -306,5 +332,6 @@ export class FormComplaintsComponent implements OnInit {
             }
         });
     }
+
 
 }
