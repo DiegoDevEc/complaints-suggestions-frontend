@@ -83,6 +83,7 @@ export class FormComplaintsComponent implements OnInit {
             lastName: ['', Validators.required],
             email: ['', [Validators.required, Validators.email]],
             description: ['', Validators.required],
+            attachment: [null],
             phone: ['', Validators.required],
             type: ['', Validators.required],
             contacted: [true, Validators.requiredTrue],
@@ -152,6 +153,15 @@ export class FormComplaintsComponent implements OnInit {
                 streetB
             });
         });
+    }
+
+    onFileSelected(event: Event) {
+        const input = event.target as HTMLInputElement;
+        const file = input.files && input.files.length ? input.files[0] : null;
+        if (file) {
+            this.complaintForm.patchValue({ attachment: file });
+            this.complaintForm.get('attachment')?.updateValueAndValidity();
+        }
     }
 
     private getCurrentPositionOnce(timeout = 10000): Promise<GeolocationPosition> {
@@ -283,7 +293,15 @@ export class FormComplaintsComponent implements OnInit {
 
         console.log("enviando formulario3");
 
-        this.complaintsService.createComplaint(this.complaintForm.value).subscribe({
+        const formData = new FormData();
+        Object.keys(this.complaintForm.controls).forEach(key => {
+            const value = this.complaintForm.get(key)?.value;
+            if (value !== null && value !== undefined) {
+                formData.append(key, value instanceof Blob ? value : String(value));
+            }
+        });
+
+        this.complaintsService.createComplaint(formData).subscribe({
             next: () => {
                 this.messageService.add({
                     severity: 'success',

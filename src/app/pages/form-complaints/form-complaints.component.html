@@ -81,6 +81,12 @@
                                     requerido</small>
                             </div>
 
+                            <div class="col-12">
+                                <label for="attachment">Imagen</label>
+                                <input type="file" id="attachment" (change)="onFileSelected($event)"
+                                    accept="image/*" capture />
+                            </div>
+
                             <!-- Coordenadas solo lectura (ocúltalas si no quieres mostrarlas) -->
                             <div class="col-12 md:col-12">
                                 <label for="address">Dirección</label>
