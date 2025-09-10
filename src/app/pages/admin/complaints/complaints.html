@@ -13,6 +13,7 @@
     </ng-template>
     <ng-template #header>
         <tr>
+            <th style="min-width: 10rem">Imagen</th>
             <th pSortableColumn="name" style="min-width: 16rem">Nombre</th>
             <th pSortableColumn="category" style="min-width: 10rem">Apellido</th>
             <th pSortableColumn="category" style="min-width: 10rem">Teléfono</th>
@@ -23,6 +24,14 @@
     </ng-template>
     <ng-template #body let-complaints>
         <tr>
+            <td>
+                <ng-container *ngIf="getAttachmentUrl(complaints) as imageUrl; else noImage">
+                    <img [src]="imageUrl" alt="Evidencia" class="w-16 h-16 object-cover rounded" />
+                </ng-container>
+                <ng-template #noImage>
+                    <span class="material-icons text-gray-400 text-4xl">image_not_supported</span>
+                </ng-template>
+            </td>
             <td style="min-width: 16rem">{{ complaints.firstName }}</td>
             <td>{{ complaints.lastName }}</td>
             <td>{{ complaints.phone }}</td>

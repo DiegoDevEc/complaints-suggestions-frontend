@@ -17,6 +17,12 @@ export interface Feedback {
     contacted: boolean;
     latitude: number;
     longitude: number;
+    attachment?: {
+        url?: string;
+        mimeType?: string;
+        size?: number;
+        originalName?: string;
+    };
     dateRegister: string; // ISO 8601 string
     __v: number;
 }

@@ -20,6 +20,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { ComplaintsService, Feedback, FeedbackStatus } from '@/pages/service/complaints.service';
+import { environment } from 'src/environments/environment';
 
 interface Column {
     field: string;
@@ -104,6 +105,10 @@ export class Complaints implements OnInit {
 
     onGlobalFilter(table: Table, event: Event) {
         table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    }
+
+    getAttachmentUrl(feedback: Feedback): string | null {
+        return feedback.attachment?.url ? `${environment.backendUrl}${feedback.attachment.url}` : null;
     }
 
     editComplaints(feedback: Feedback) {
