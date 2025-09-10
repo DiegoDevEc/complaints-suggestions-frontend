@@ -21,6 +21,8 @@ import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { ComplaintsService, Feedback, FeedbackStatus } from '@/pages/service/complaints.service';
 import { environment } from 'src/environments/environment';
+import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
+import { ImagePreviewDialogComponent } from '@/shared/components/image-preview-dialog/image-preview-dialog.component';
 
 interface Column {
     field: string;
@@ -54,11 +56,12 @@ interface ExportColumn {
         InputIconModule,
         IconFieldModule,
         ConfirmDialogModule,
-        Select
+        Select,
+        DynamicDialogModule
     ],
     templateUrl: './complaints.html',
     styleUrl: './complaints.scss',
-    providers: [MessageService, ProductService, ConfirmationService, ComplaintsService]
+    providers: [MessageService, ProductService, ConfirmationService, ComplaintsService, DialogService]
 })
 export class Complaints implements OnInit {
     complaintsDialog: boolean = false;
@@ -89,7 +92,8 @@ export class Complaints implements OnInit {
         private productService: ProductService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
-        private complaintsService: ComplaintsService
+        private complaintsService: ComplaintsService,
+        private dialogService: DialogService
     ) {}
 
     ngOnInit() {
@@ -109,6 +113,23 @@ export class Complaints implements OnInit {
 
     getAttachmentUrl(feedback: Feedback): string | null {
         return feedback.attachment?.url ? `${environment.backendUrl}${feedback.attachment.url}` : null;
+    }
+
+    openImageDialog(feedback: Feedback) {
+        const imageUrl = this.getAttachmentUrl(feedback);
+        if (!imageUrl) {
+            return;
+        }
+        this.dialogService.open(ImagePreviewDialogComponent, {
+            data: {
+                imageUrl,
+                originalName: feedback.attachment?.originalName
+            },
+            header: feedback.attachment?.originalName,
+            width: '60vw',
+            modal: true,
+            dismissableMask: true
+        });
     }
 
     editComplaints(feedback: Feedback) {
@@ -156,16 +177,16 @@ export class Complaints implements OnInit {
 
     saveFeedback() {
         this.submitted = true;
-       // const updated = this.complaints().map((c) => (c._id === this.feedback._id ? { ...c, status: this.feedback.status } : c));
-       // this.complaints.set(updated);
-       this.complaintsService.updateFeedback(this.feedback).subscribe(() => {
+        // const updated = this.complaints().map((c) => (c._id === this.feedback._id ? { ...c, status: this.feedback.status } : c));
+        // this.complaints.set(updated);
+        this.complaintsService.updateFeedback(this.feedback).subscribe(() => {
             this.loadData();
             this.messageService.add({
                 severity: 'success',
                 summary: 'Successful',
                 detail: 'Queja actualizada',
                 life: 3000
-       })
+            });
         });
         this.submitted = false;
         this.feedback = {} as Feedback;
