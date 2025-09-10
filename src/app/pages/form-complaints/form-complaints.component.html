@@ -82,10 +82,17 @@
                             </div>
 
                             <div class="col-12">
-                                <label for="attachment">Imagen</label>
-                                <input type="file" id="attachment" (change)="onFileSelected($event)"
-                                    accept="image/*" capture />
-                            </div>
+                               <b> <label for="attachment">Imagen </label> </b> 
+                                <input type="file" id="attachment" (change)="onFileSelected($event)" accept="image/*" capture />
+                                
+                                <!-- Vista previa -->
+                                <div *ngIf="previewUrl" style="margin-top:10px;">
+                                    <img [src]="previewUrl"
+                                         alt="Vista previa"
+                                         style="max-width:100% !important; height:auto; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.2);" />
+                                  </div>
+                                  
+                              </div>
 
                             <!-- Coordenadas solo lectura (ocúltalas si no quieres mostrarlas) -->
                             <div class="col-12 md:col-12">
