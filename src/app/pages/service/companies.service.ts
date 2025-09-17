@@ -41,6 +41,28 @@ export interface CompanyListResponse {
     limit: number;
 }
 
+export interface NotAssignedUserPersonalData {
+    _id: string;
+    name: string;
+    lastname: string;
+    dni: string;
+    phone: string;
+}
+
+export interface NotAssignedUser {
+    _id: string;
+    username: string;
+    email: string;
+    personalData?: NotAssignedUserPersonalData | null;
+}
+
+export interface NotAssignedUsersResponse {
+    data: NotAssignedUser[];
+    total: number;
+    page: number;
+    limit: number;
+}
+
 export interface UpdateCompanyPayload {
     name: string;
     description: string;
@@ -51,6 +73,7 @@ export interface UpdateCompanyPayload {
 export class CompaniesService {
     private readonly apiUrl = environment.backendUrl;
     private readonly companiesEndpoint = `${this.apiUrl}/private/companies`;
+    private readonly notAssignedUsersEndpoint = `${this.apiUrl}/auth/users/not-assigned`;
 
     constructor(private http: HttpClient) { }
 
@@ -74,7 +97,12 @@ export class CompaniesService {
         return this.http.post(`${this.companiesEndpoint}/${companyId}/contacts`, { personId });
     }
 
-    removeUserFromCompany(companyId: string, userId: string) {
-        return this.http.delete(`${this.companiesEndpoint}/${companyId}/contacts/${userId}`);
+    removeUserFromCompany(companyId: string, personId: string) {
+        return this.http.patch(`${this.companiesEndpoint}/${companyId}/contacts`, { personId });
+    }
+
+    getNotAssignedUsers(page: number = 1, limit: number = 10) {
+        const params = new HttpParams().set('page', page).set('limit', limit);
+        return this.http.get<NotAssignedUsersResponse>(this.notAssignedUsersEndpoint, { params });
     }
 }
