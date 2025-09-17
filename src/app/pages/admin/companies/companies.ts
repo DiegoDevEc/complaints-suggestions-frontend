@@ -14,8 +14,9 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Select } from 'primeng/select';
 import { RippleModule } from 'primeng/ripple';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { CompaniesService, Company, CompanyStatus } from '@/pages/service/companies.service';
-import { CardModule } from "primeng/card";
+import { CompaniesService, Company, CompanyStatus, NotAssignedUser } from '@/pages/service/companies.service';
+import { CardModule } from 'primeng/card';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 interface CompanyStatusOption {
     label: string;
@@ -28,22 +29,23 @@ interface CompanyStatusOption {
     templateUrl: './companies.html',
     styleUrl: './companies.scss',
     imports: [
-    CommonModule,
-    TableModule,
-    FormsModule,
-    ButtonModule,
-    TagModule,
-    InputTextModule,
-    IconFieldModule,
-    InputIconModule,
-    DialogModule,
-    TextareaModule,
-    ToastModule,
-    ConfirmDialogModule,
-    Select,
-    RippleModule,
-    CardModule
-],
+        CommonModule,
+        TableModule,
+        FormsModule,
+        ButtonModule,
+        TagModule,
+        InputTextModule,
+        IconFieldModule,
+        InputIconModule,
+        DialogModule,
+        TextareaModule,
+        ToastModule,
+        ConfirmDialogModule,
+        Select,
+        RippleModule,
+        CardModule,
+        ProgressSpinnerModule
+    ],
     providers: [MessageService, ConfirmationService, CompaniesService]
 })
 export class Companies implements OnInit {
@@ -54,6 +56,14 @@ export class Companies implements OnInit {
     companyDialog = false;
     selectedCompany: Company | null = null;
     submitted = false;
+
+    assignContactDialog = false;
+    selectedCompanyForContact: Company | null = null;
+    availableContacts = signal<NotAssignedUser[]>([]);
+    availableContactsTotal = 0;
+    availableContactsLoading = false;
+    availableContactsRows = 10;
+    assigningContactId: string | null = null;
 
     statuses: CompanyStatusOption[] = [
         { label: 'Activa', value: 'ACT' },
@@ -86,6 +96,15 @@ export class Companies implements OnInit {
             next: (response) => {
                 this.companies.set(response.data);
                 this.totalRecords = response.total;
+                if (this.selectedCompany) {
+                    const updatedCompany = response.data.find((item) => item._id === this.selectedCompany?._id);
+                    if (updatedCompany) {
+                        this.selectedCompany = {
+                            ...updatedCompany,
+                            contacts: updatedCompany.contacts ? [...updatedCompany.contacts] : []
+                        };
+                    }
+                }
                 this.loading = false;
             },
             error: () => {
@@ -219,8 +238,105 @@ export class Companies implements OnInit {
         });
     }
 
+    openAssignContactDialog(company: Company) {
+        this.selectedCompanyForContact = company;
+        this.assignContactDialog = true;
+        const initialEvent: TableLazyLoadEvent = { first: 0, rows: this.availableContactsRows };
+        this.loadAvailableContacts(initialEvent);
+    }
+
+    loadAvailableContacts(event: TableLazyLoadEvent) {
+        const first = event.first ?? 0;
+        const rows = event.rows && event.rows > 0 ? event.rows : this.availableContactsRows;
+        const page = Math.floor(first / rows) + 1;
+        const limit = rows;
+
+        this.availableContactsRows = rows;
+        this.availableContactsLoading = true;
+
+        this.companiesService.getNotAssignedUsers(page, limit).subscribe({
+            next: (response) => {
+                this.availableContacts.set(response.data);
+                this.availableContactsTotal = response.total;
+                this.availableContactsLoading = false;
+            },
+            error: () => {
+                this.availableContacts.set([]);
+                this.availableContactsTotal = 0;
+                this.availableContactsLoading = false;
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'No se pudieron cargar los contactos disponibles',
+                    life: 3000
+                });
+            }
+        });
+    }
+
+    assignContact(user: NotAssignedUser) {
+        if (!this.selectedCompanyForContact) {
+            return;
+        }
+
+        const personId = user.personalData?._id;
+
+        if (!personId) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'El contacto seleccionado no tiene información personal válida',
+                life: 3000
+            });
+            return;
+        }
+
+        this.assigningContactId = user._id;
+
+        this.companiesService.addUserToCompany(this.selectedCompanyForContact._id, personId).subscribe({
+            next: () => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Éxito',
+                    detail: 'Contacto asignado correctamente',
+                    life: 3000
+                });
+                this.assigningContactId = null;
+                this.assignContactDialog = false;
+                this.resetAssignContactDialogState();
+                this.reloadCurrentPage();
+            },
+            error: () => {
+                this.assigningContactId = null;
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'No se pudo asignar el contacto',
+                    life: 3000
+                });
+            }
+        });
+    }
+
+    closeAssignContactDialog() {
+        this.assignContactDialog = false;
+    }
+
+    onAssignContactDialogHide() {
+        this.resetAssignContactDialogState();
+    }
+
     private reloadCurrentPage() {
         const fallbackEvent: TableLazyLoadEvent = { first: 0, rows: 10 };
         this.loadCompaniesLazy(this.lastLazyEvent ?? fallbackEvent);
+    }
+
+    private resetAssignContactDialogState() {
+        this.selectedCompanyForContact = null;
+        this.availableContacts.set([]);
+        this.availableContactsTotal = 0;
+        this.availableContactsLoading = false;
+        this.availableContactsRows = 10;
+        this.assigningContactId = null;
     }
 }

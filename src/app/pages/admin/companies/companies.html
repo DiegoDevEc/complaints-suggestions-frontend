@@ -19,7 +19,7 @@
             <th pSortableColumn="description" style="min-width: 16rem">Descripción</th>
             <th pSortableColumn="status" style="min-width: 10rem">Estado</th>
             <th style="min-width: 10rem">Contactos</th>
-            <th style="width: 8rem"></th>
+            <th style="width: 12rem"></th>
         </tr>
     </ng-template>
     <ng-template #body let-company>
@@ -31,6 +31,8 @@
             </td>
             <td>{{ company.contacts?.length || 0 }}</td>
             <td class="flex gap-2">
+                <p-button icon="pi pi-user-plus" severity="success" [rounded]="true" [outlined]="true"
+                    (click)="openAssignContactDialog(company)" ariaLabel="Agregar contacto" />
                 <p-button icon="pi pi-pencil" [rounded]="true" [outlined]="true" (click)="editCompany(company)" />
                 <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
                     (click)="confirmDeleteCompany(company)" />
@@ -99,6 +101,65 @@
     <ng-template #footer>
         <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
         <p-button label="Guardar" icon="pi pi-check" (click)="saveCompany()" />
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="assignContactDialog" [style]="{ width: '720px' }" header="Agregar contacto" [modal]="true"
+    (onHide)="onAssignContactDialogHide()">
+    <ng-template #content>
+        <ng-container *ngIf="selectedCompanyForContact as company">
+            <p class="mb-4 text-sm text-gray-600">
+                Selecciona un contacto para asignar a <strong>{{ company.name }}</strong>.
+            </p>
+
+            <p-table [value]="availableContacts()" [paginator]="true" [rows]="availableContactsRows"
+                [totalRecords]="availableContactsTotal" [lazy]="true" (onLazyLoad)="loadAvailableContacts($event)"
+                [rowsPerPageOptions]="[10, 20, 30]" [loading]="availableContactsLoading" dataKey="_id"
+                currentPageReportTemplate="Del {first} al {last} de {totalRecords} empleados" [showCurrentPageReport]="true">
+                <ng-template #header>
+                    <tr>
+                        <th>Nombre completo</th>
+                        <th>DNI</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th style="width: 8rem"></th>
+                    </tr>
+                </ng-template>
+                <ng-template #body let-user>
+                    <tr>
+                        <td>{{ user.personalData?.name || 'Sin nombre' }} {{ user.personalData?.lastname || '' }}</td>
+                        <td>{{ user.personalData?.dni || 'Sin DNI' }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.personalData?.phone || 'Sin teléfono' }}</td>
+                        <td class="text-right">
+                            <p-button label="Seleccionar" icon="pi pi-user-plus" size="small"
+                                (click)="assignContact(user)" [loading]="assigningContactId === user._id"
+                                [disabled]="assigningContactId !== null && assigningContactId !== user._id" />
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template #emptymessage>
+                    <tr>
+                        <td colspan="5" class="py-4 text-center text-gray-500">
+                            No hay usuarios disponibles para asignar.
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template #loading>
+                    <tr>
+                        <td colspan="5">
+                            <div class="flex items-center justify-center py-6">
+                                <p-progressSpinner styleClass="w-8 h-8" strokeWidth="4" />
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </ng-container>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cerrar" icon="pi pi-times" text (click)="closeAssignContactDialog()" />
     </ng-template>
 </p-dialog>
 
