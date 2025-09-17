@@ -1,78 +1,89 @@
 import { Select } from 'primeng/select';
-import { Component, OnInit, signal, ViewChild } from '@angular/core';
-import { InputNumberModule } from 'primeng/inputnumber';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-import { Table, TableModule } from 'primeng/table';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
-import { RatingModule } from 'primeng/rating';
 import { TagModule } from 'primeng/tag';
-import { Product, ProductService } from '@/pages/service/product.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { RadioButtonModule } from 'primeng/radiobutton';
 import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
-import { ToolbarModule } from 'primeng/toolbar';
 import { ComplaintsService, Feedback, FeedbackStatus } from '@/pages/service/complaints.service';
 import { environment } from 'src/environments/environment';
 import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 import { ImagePreviewDialogComponent } from '@/shared/components/image-preview-dialog/image-preview-dialog.component';
-
-interface Column {
-    field: string;
-    header: string;
-    customExportHeader?: string;
-}
-
-interface ExportColumn {
-    title: string;
-    dataKey: string;
-}
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
+import { AvatarModule } from 'primeng/avatar';
 
 @Component({
     selector: 'app-complaints',
     standalone: true,
     imports: [
         CommonModule,
-        TableModule,
         FormsModule,
         ButtonModule,
         RippleModule,
         ToastModule,
-        ToolbarModule,
-        RatingModule,
         InputTextModule,
         TextareaModule,
-        RadioButtonModule,
-        InputNumberModule,
         DialogModule,
         TagModule,
         InputIconModule,
         IconFieldModule,
         ConfirmDialogModule,
+        PaginatorModule,
+        AvatarModule,
         Select,
         DynamicDialogModule
     ],
     templateUrl: './complaints.html',
     styleUrl: './complaints.scss',
-    providers: [MessageService, ProductService, ConfirmationService, ComplaintsService, DialogService]
+    providers: [MessageService, ConfirmationService, ComplaintsService, DialogService]
 })
 export class Complaints implements OnInit {
     complaintsDialog: boolean = false;
+    viewDialogVisible = false;
 
-    products = signal<Product[]>([]);
     complaints = signal<Feedback[]>([]);
     totalRecords = 0;
+    rowsPerPageOptions = [10, 20, 30];
+    rows = 10;
+    first = 0;
+
+    searchTerm = signal('');
+    filteredComplaints = computed(() => {
+        const term = this.searchTerm().trim().toLowerCase();
+        const list = this.complaints();
+
+        if (!term) {
+            return list;
+        }
+
+        return list.filter((feedback) => {
+            const searchable = [
+                feedback.firstName,
+                feedback.lastName,
+                feedback.email,
+                feedback.phone,
+                feedback.description,
+                this.getTypeDescription(feedback.type),
+                this.getDescriptionStatus(feedback.status)
+            ]
+                .filter(Boolean)
+                .join(' ')
+                .toLowerCase();
+
+            return searchable.includes(term);
+        });
+    });
 
     feedback!: Feedback;
-
-    selectedProducts!: Product[] | null;
+    viewFeedback: Feedback | null = null;
 
     submitted: boolean = false;
 
@@ -83,14 +94,7 @@ export class Complaints implements OnInit {
         { value: 'CANCEL', label: 'Cancelado' }
     ];
 
-    @ViewChild('dt') dt!: Table;
-
-    exportColumns!: ExportColumn[];
-
-    cols!: Column[];
-
     constructor(
-        private productService: ProductService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
         private complaintsService: ComplaintsService,
@@ -102,24 +106,32 @@ export class Complaints implements OnInit {
         // this.loadData();
     }
 
-    loadComplaintsLazy(event: any) {
-        const page = Math.floor(event.first / event.rows) + 1; // backend usa page base 1
-        const limit = event.rows;
+    loadComplaintsLazy(event: Partial<PaginatorState>) {
+        const first = event.first ?? 0;
+        const limit = event.rows ?? this.rows;
+        const page = Math.floor(first / limit) + 1; // backend usa page base 1
 
         this.complaintsService.getComplaints(page, limit).subscribe((response) => {
             this.complaints.set(response.data);
             this.totalRecords = response.total;
+            this.rows = limit;
+            this.first = first;
         });
     }
 
-    // loadData() {
-    //     this.complaintsService.getComplaints().subscribe((response) => {
-    //        this.complaints.set(response.data);
-    //     });
-    // }
+    onPageChange(event: PaginatorState) {
+        const first = event.first ?? 0;
+        const rows = event.rows ?? this.rows;
+        this.loadComplaintsLazy({ first, rows });
+    }
 
-    onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    onSearch(event: Event) {
+        const value = (event.target as HTMLInputElement).value ?? '';
+        this.searchTerm.set(value);
+    }
+
+    trackById(_: number, feedback: Feedback) {
+        return feedback._id;
     }
 
     getAttachmentUrl(feedback: Feedback): string | null {
@@ -148,9 +160,19 @@ export class Complaints implements OnInit {
         this.complaintsDialog = true;
     }
 
+    viewComplaints(feedback: Feedback) {
+        this.viewFeedback = feedback;
+        this.viewDialogVisible = true;
+    }
+
     hideDialog() {
         this.complaintsDialog = false;
         this.submitted = false;
+    }
+
+    closeViewDialog() {
+        this.viewDialogVisible = false;
+        this.viewFeedback = null;
     }
 
     cancelFeedback(feedback: Feedback) {
@@ -221,14 +243,44 @@ export class Complaints implements OnInit {
     getTypeClass(type: string): string {
         switch (type) {
             case 'complaint':
-                return 'text-red-500'; // rojo
+                return 'type-chip--complaint';
             case 'suggestion':
-                return 'text-blue-500'; // azul
+                return 'type-chip--suggestion';
             case 'compliment':
-                return 'text-green-500'; // verde
+                return 'type-chip--compliment';
             default:
-                return 'text-gray-500'; // gris
+                return 'type-chip--unknown';
         }
+    }
+
+    getShortDescription(description: string | null | undefined, maxLength: number = 160) {
+        const text = (description ?? '').trim();
+        if (!text) {
+            return 'Sin descripción proporcionada.';
+        }
+
+        if (text.length <= maxLength) {
+            return text;
+        }
+
+        return `${text.slice(0, maxLength - 1).trim()}…`;
+    }
+
+    formatDate(dateValue: string | null | undefined) {
+        if (!dateValue) {
+            return 'Sin fecha disponible';
+        }
+
+        const parsed = new Date(dateValue);
+
+        if (Number.isNaN(parsed.getTime())) {
+            return dateValue;
+        }
+
+        return new Intl.DateTimeFormat('es-PE', {
+            dateStyle: 'medium',
+            timeStyle: 'short'
+        }).format(parsed);
     }
 
     saveFeedback() {
