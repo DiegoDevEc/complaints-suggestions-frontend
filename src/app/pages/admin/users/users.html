@@ -58,6 +58,7 @@
             <th style="min-width: 10rem">Apellido</th>
             <th style="min-width: 10rem">Usuario</th>
             <th style="min-width: 14rem">Email</th>
+            <th style="min-width: 8rem">Estado</th>
             <th style="width: 12rem">Acciones</th>
         </tr>
     </ng-template>
@@ -68,19 +69,23 @@
             <td>{{ user.personalData?.lastname || '' }}</td>
             <td>{{ user.username }}</td>
             <td>{{ user.email }}</td>
+
+            <td>
+                <p-tag [value]="getStatusLabel(user.status)" [severity]="getStatusSeverity(user.status)" />
+            </td>
             <td>
                 <div class="flex flex-wrap gap-2">
                     <p-button
-                        label="Editar"
                         icon="pi pi-pencil"
+                        [rounded]="true"
                         outlined
                         size="small"
                         (click)="editUser(user)"
                     />
                     <p-button
-                        label="Eliminar"
                         icon="pi pi-trash"
                         severity="danger"
+                        [rounded]="true"
                         outlined
                         size="small"
                         (click)="deleteUser(user)"

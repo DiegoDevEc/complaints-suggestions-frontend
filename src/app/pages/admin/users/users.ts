@@ -23,6 +23,7 @@ import {
     UpdateUserPayload,
     PersonalData
 } from '@/pages/service/users.service';
+import { TagModule } from 'primeng/tag';
 
 interface RoleOption {
     label: string;
@@ -41,6 +42,7 @@ interface RoleOption {
         TableModule,
         ButtonModule,
         ToastModule,
+        TagModule,
         ConfirmDialogModule,
         DialogModule,
         InputTextModule,
@@ -221,8 +223,11 @@ export class Users implements OnInit {
                 username: formValue.username?.trim(),
                 email: formValue.email?.trim(),
                 role: formValue.role,
-                isFirstLogin: formValue.isFirstLogin ?? false,
-                personalData: this.buildPersonalData(formValue.personalData)
+                phone: formValue.personalData?.phone?.trim() ?? '',
+                name: formValue.personalData?.name?.trim() ?? '',
+                lastname: formValue.personalData?.lastname?.trim() ?? '',
+                dni: formValue.personalData?.dni?.trim() ?? '',
+                password: ''
             };
 
             this.usersService.updateUser(this.selectedUser._id, payload).subscribe({
@@ -364,4 +369,26 @@ export class Users implements OnInit {
         const hasValue = Object.values(trimmed).some((value) => !!value);
         return hasValue ? trimmed : null;
     }
+
+     getStatusSeverity(status: string) {
+            switch (status) {
+                case 'ACT':
+                    return 'success';
+                case 'INA':
+                    return 'danger';
+                default:
+                    return 'info';
+            }
+        }
+
+        getStatusLabel(status: string) {
+            switch (status) {
+                case 'ACT':
+                    return 'Activa';
+                case 'INA':
+                    return 'Inactiva';
+                default:
+                    return status;
+            }
+        }
 }

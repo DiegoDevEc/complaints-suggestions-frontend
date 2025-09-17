@@ -38,14 +38,18 @@ export interface CreateUserPayload {
 export interface UpdateUserPayload {
     username?: string;
     email?: string;
+    name?: string;
+    password?: string;
+    lastname?: string;
+    dni?: string;
+    phone?: string;
     role?: string;
-    isFirstLogin?: boolean;
-    personalData?: PersonalData | null;
 }
 
 @Injectable()
 export class UsersService {
     private readonly apiUrl = environment.backendUrl;
+    private readonly usersEndpointAdmin = `${this.apiUrl}/auth/users`;
     private readonly usersEndpoint = `${this.apiUrl}/private/users`;
     private readonly registerEndpoint = `${this.apiUrl}/auth/register`;
 
@@ -58,7 +62,7 @@ export class UsersService {
             params = params.set('search', search.trim());
         }
 
-        return this.http.get<PaginatedResponse<User>>(this.usersEndpoint, { params });
+        return this.http.get<PaginatedResponse<User>>(this.usersEndpointAdmin, { params });
     }
 
     createUser(payload: CreateUserPayload) {
@@ -66,10 +70,12 @@ export class UsersService {
     }
 
     updateUser(userId: string, payload: UpdateUserPayload) {
-        return this.http.patch<User>(`${this.usersEndpoint}/${userId}`, payload);
+        console.log(payload);
+
+        return this.http.patch<User>(`${this.usersEndpointAdmin}/${userId}`, payload);
     }
 
     deleteUser(userId: string) {
-        return this.http.delete<void>(`${this.usersEndpoint}/${userId}`);
+        return this.http.delete<void>(`${this.usersEndpointAdmin}/${userId}`);
     }
 }
