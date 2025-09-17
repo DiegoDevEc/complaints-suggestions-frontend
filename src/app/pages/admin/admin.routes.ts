@@ -1,9 +1,13 @@
 import { Routes } from '@angular/router';
 import { Complaints } from './complaints/complaints';
 import { MenuDemo } from '../uikit/menudemo';
+import { Users } from './users/users';
+import { Companies } from './companies/companies';
 
 export default [
     { path: 'complaints', data: { breadcrumb: 'Quejas' }, component: Complaints },
+    { path: 'users', data: { breadcrumb: 'Usuarios' }, component: Users },
+    { path: 'companies', data: { breadcrumb: 'Empresas' }, component: Companies },
     { path: 'menu', data: { breadcrumb: 'Menu' }, component: MenuDemo },
     /*{ path: 'button', data: { breadcrumb: 'Button' }, component: ButtonDemo },
     { path: 'charts', data: { breadcrumb: 'Charts' }, component: ChartDemo },

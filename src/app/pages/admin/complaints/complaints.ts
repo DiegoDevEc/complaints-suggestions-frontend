@@ -68,6 +68,7 @@ export class Complaints implements OnInit {
 
     products = signal<Product[]>([]);
     complaints = signal<Feedback[]>([]);
+    totalRecords = 0;
 
     feedback!: Feedback;
 
@@ -94,18 +95,28 @@ export class Complaints implements OnInit {
         private confirmationService: ConfirmationService,
         private complaintsService: ComplaintsService,
         private dialogService: DialogService
-    ) {}
+    ) { }
 
     ngOnInit() {
-        this.loadData();
+        this.loadComplaintsLazy({ first: 0, rows: 10 });
+        // this.loadData();
     }
 
-    loadData() {
-        this.complaintsService.getComplaints().subscribe((response) => {
-            console.log('Complaints loaded:', response.data);
+    loadComplaintsLazy(event: any) {
+        const page = Math.floor(event.first / event.rows) + 1; // backend usa page base 1
+        const limit = event.rows;
+
+        this.complaintsService.getComplaints(page, limit).subscribe((response) => {
             this.complaints.set(response.data);
+            this.totalRecords = response.total;
         });
     }
+
+    // loadData() {
+    //     this.complaintsService.getComplaints().subscribe((response) => {
+    //        this.complaints.set(response.data);
+    //     });
+    // }
 
     onGlobalFilter(table: Table, event: Event) {
         table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
@@ -147,9 +158,11 @@ export class Complaints implements OnInit {
             message: 'Esta seguro de cancelar la queja:  ' + feedback.description + '?',
             header: 'Confirmar',
             icon: 'pi pi-exclamation-triangle',
+            acceptButtonProps: { label: 'Sí', icon: 'pi pi-check' },
+            rejectButtonProps: { label: 'No', icon: 'pi pi-times', class: 'p-button-text' },
             accept: () => {
                 this.complaintsService.cancelFeedback(feedback._id).subscribe(() => {
-                    this.loadData();
+                    this.loadComplaintsLazy({ first: 0, rows: 10 });
                     this.feedback = {} as Feedback;
                 });
                 this.messageService.add({
@@ -170,8 +183,51 @@ export class Complaints implements OnInit {
                 return 'success';
             case 'IN_PROGRESS':
                 return 'info';
+            case 'CANCEL':
+                return 'danger';
             default:
                 return 'info';
+        }
+    }
+
+    getDescriptionStatus(status: FeedbackStatus) {
+        switch (status) {
+            case 'PENDING':
+                return 'Pendiente';
+            case 'RESOLVED':
+                return 'Resuelto';
+            case 'IN_PROGRESS':
+                return 'En progreso';
+            case 'CANCEL':
+                return 'Cancelado';
+            default:
+                return 'Desconocido';
+        }
+    }
+
+    getTypeDescription(type: string) {
+        switch (type) {
+            case 'complaint':
+                return 'Queja';
+            case 'compliment':
+                return 'Felicitación';
+            case 'suggestion':
+                return 'Sugerencia';
+            default:
+                return 'Desconocido';
+        }
+    }
+
+    getTypeClass(type: string): string {
+        switch (type) {
+            case 'complaint':
+                return 'text-red-500'; // rojo
+            case 'suggestion':
+                return 'text-blue-500'; // azul
+            case 'compliment':
+                return 'text-green-500'; // verde
+            default:
+                return 'text-gray-500'; // gris
         }
     }
 
@@ -180,7 +236,8 @@ export class Complaints implements OnInit {
         // const updated = this.complaints().map((c) => (c._id === this.feedback._id ? { ...c, status: this.feedback.status } : c));
         // this.complaints.set(updated);
         this.complaintsService.updateFeedback(this.feedback).subscribe(() => {
-            this.loadData();
+
+            this.loadComplaintsLazy({ first: 0, rows: 10 });
             this.messageService.add({
                 severity: 'success',
                 summary: 'Successful',

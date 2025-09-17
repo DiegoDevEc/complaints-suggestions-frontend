@@ -40,8 +40,8 @@ export class ComplaintsService {
 
     constructor(private http: HttpClient) {}
 
-    getComplaints() {
-        return this.http.get<FeedbackListResponse>(`${this.apiUrl}/private/feedback?page=1&limit=10`);
+    getComplaints(page: number = 1, limit: number = 10) {
+        return this.http.get<FeedbackListResponse>(`${this.apiUrl}/private/feedback?page=${page}}&limit=${limit}}`);
     }
 
     createComplaint(payload: FormData) {
