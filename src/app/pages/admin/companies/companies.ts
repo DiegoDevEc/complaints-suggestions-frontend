@@ -339,4 +339,41 @@ export class Companies implements OnInit {
         this.availableContactsRows = 10;
         this.assigningContactId = null;
     }
+
+    removeContact(idContact: string) {
+        if (!this.selectedCompany) {
+            return;
+        }
+
+        if (!idContact) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'El contacto seleccionado no tiene información personal válida',
+                life: 3000
+            });
+            return;
+        }
+
+        this.companiesService.removeUserFromCompany(this.selectedCompany._id, idContact).subscribe({
+            next: () => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Éxito',
+                    detail: 'Contacto removido correctamente',
+                    life: 3000
+                });
+                this.reloadCurrentPage();
+                this.hideDialog();
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'No se pudo remover el contacto',
+                    life: 3000
+                });
+            }
+        });
+    }
 }

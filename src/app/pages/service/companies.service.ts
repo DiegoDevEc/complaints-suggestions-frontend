@@ -97,8 +97,8 @@ export class CompaniesService {
         return this.http.post(`${this.companiesEndpoint}/${companyId}/contacts`, { personId });
     }
 
-    removeUserFromCompany(companyId: string, userId: string) {
-        return this.http.delete(`${this.companiesEndpoint}/${companyId}/contacts/${userId}`);
+    removeUserFromCompany(companyId: string, personId: string) {
+        return this.http.patch(`${this.companiesEndpoint}/${companyId}/contacts`, { personId });
     }
 
     getNotAssignedUsers(page: number = 1, limit: number = 10) {

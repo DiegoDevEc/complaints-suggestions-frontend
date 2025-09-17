@@ -74,17 +74,24 @@
                                 </ng-template>
 
                                 <ng-template pTemplate="subtitle">
-                                    <p-tag value="{{ getRoleLabel(contact.user.role)  || 'Empleado' }}" severity="info"></p-tag>
+                                    <p-tag value="{{ getRoleLabel(contact.user.role)  || 'Empleado' }}"
+                                        severity="info"></p-tag>
                                 </ng-template>
 
                                 <ng-template pTemplate="content">
-                                    <div class="text-sm text-gray-700">
-                                        <p><i class="pi pi-envelope mr-2 text-blue-500"></i>{{ contact.user.email }}
-                                        </p>
-                                        <p><i class="pi pi-phone mr-2 text-green-500"></i>{{ contact.phone || 'No registrado' }}</p>
+                                    <div class="text-sm text-gray-700 space-y-2">
+                                        <p><i class="pi pi-envelope mr-2 text-blue-500"></i>{{ contact.user.email }}</p>
+                                        <p><i class="pi pi-phone mr-2 text-green-500"></i>{{ contact.phone || 'No
+                                            registrado' }}</p>
                                         <p><i class="pi pi-id-card mr-2 text-purple-500"></i>{{ contact.dni }}</p>
+
+                                        <div class="flex justify-end">
+                                            <p-button label="Eliminar" icon="pi pi-trash" severity="danger" outlined
+                                                size="small" (click)="removeContact(contact._id)" />
+                                        </div>
                                     </div>
                                 </ng-template>
+
                             </p-card>
                         </ng-container>
 
@@ -115,7 +122,8 @@
             <p-table [value]="availableContacts()" [paginator]="true" [rows]="availableContactsRows"
                 [totalRecords]="availableContactsTotal" [lazy]="true" (onLazyLoad)="loadAvailableContacts($event)"
                 [rowsPerPageOptions]="[10, 20, 30]" [loading]="availableContactsLoading" dataKey="_id"
-                currentPageReportTemplate="Del {first} al {last} de {totalRecords} empleados" [showCurrentPageReport]="true">
+                currentPageReportTemplate="Del {first} al {last} de {totalRecords} empleados"
+                [showCurrentPageReport]="true">
                 <ng-template #header>
                     <tr>
                         <th>Nombre completo</th>
