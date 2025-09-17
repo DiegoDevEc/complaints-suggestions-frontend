@@ -4,6 +4,7 @@ import { Dashboard } from './app/pages/dashboard/dashboard';
 import { Notfound } from './app/pages/notfound/notfound';
 import { FormComplaintsComponent } from '@/pages/form-complaints/form-complaints.component';
 import { authGuard } from '@/guards/auth.guard';
+import { ViewComplaint } from '@/pages/view-complaint/view-complaint';
 
 export const appRoutes: Routes = [
     { path: '', component: FormComplaintsComponent },
@@ -20,5 +21,6 @@ export const appRoutes: Routes = [
     },
     { path: 'notfound', component: Notfound },
     { path: 'auth', loadChildren: () => import('./app/pages/auth/auth.routes') },
+    {path: 'view-complaint', component: ViewComplaint},
     { path: '**', redirectTo: '/notfound' }
 ];

@@ -164,7 +164,7 @@ export class FormComplaintsComponent implements OnInit {
           // setea el archivo en el form
           this.complaintForm.patchValue({ attachment: file });
           this.complaintForm.get('attachment')?.updateValueAndValidity();
-      
+
           // genera la vista previa
           this.previewUrl && URL.revokeObjectURL(this.previewUrl); // liberar anterior
           this.previewUrl = URL.createObjectURL(file);
@@ -273,8 +273,6 @@ export class FormComplaintsComponent implements OnInit {
     }
 
     onSubmit() {
-        console.log("enviando formulario");
-
         this.submitted = true;
 
         const { latitude, longitude } = this.complaintForm.value;
@@ -287,18 +285,10 @@ export class FormComplaintsComponent implements OnInit {
             return;
         }
 
-        console.log("enviando formulario2");
-        console.log(this.complaintForm.value);
-
-
         if (this.complaintForm.invalid) {
-            console.log("formulario invalido rompe despues de 2");
-
             this.complaintForm.markAllAsTouched();
             return;
         }
-
-        console.log("enviando formulario3");
 
         const formData = new FormData();
         Object.keys(this.complaintForm.controls).forEach(key => {
@@ -315,8 +305,6 @@ export class FormComplaintsComponent implements OnInit {
                     summary: 'Éxito',
                     detail: 'Formulario enviado correctamente'
                 });
-                //this.complaintForm.reset();
-                //this.ngOnInit();
                 this.complaintForm.reset();
                 this.complaintForm.controls['contacted'].setValue(true);
                 this.submitted = false;
@@ -324,7 +312,6 @@ export class FormComplaintsComponent implements OnInit {
                 this.previewUrl = null;
             },
             error: (err) => {
-                // Si tu backend responde 401, muéstralo claro
                 const msg = err?.status === 401
                     ? 'No autorizado: inicia sesión para enviar el formulario.'
                     : 'No se pudo enviar la información';

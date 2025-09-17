@@ -25,6 +25,15 @@ import { AppFloatingConfigurator } from "@/layout/component/app.floatingconfigur
           [rounded]="true"
           [text]="true">
         </button>
+        <button
+          pButton
+          pRipple
+          label="Seguimiento"
+          routerLink="/view-complaint"
+          [rounded]="true"
+          [text]="true">
+        </button>
+
         <app-floating-configurator [float]="false" />
       </div>
     </nav>
