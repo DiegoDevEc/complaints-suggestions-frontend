@@ -1,1 +1,189 @@
-<p>users works!</p>
+<p-toast />
+<p-confirmDialog />
+
+<p-table
+    #dt
+    [value]="users()"
+    [lazy]="true"
+    [paginator]="true"
+    [rows]="rows"
+    [totalRecords]="totalRecords"
+    (onLazyLoad)="loadUsers($event)"
+    [loading]="loading"
+    dataKey="_id"
+    currentPageReportTemplate="Del {first} al {last} de {totalRecords} usuarios"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[5, 10, 20, 50]"
+    class="shadow-sm"
+>
+    <ng-template #caption>
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div class="flex flex-col gap-1">
+                <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0 m-0">
+                    Usuarios registrados
+                </h2>
+                <p class="text-sm text-surface-500 dark:text-surface-400 m-0">
+                    Administra los usuarios del sistema.
+                </p>
+            </div>
+            <div class="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
+                <p-iconfield class="w-full md:w-72">
+                    <p-inputicon styleClass="pi pi-search" />
+                    <input
+                        pInputText
+                        type="text"
+                        class="w-full"
+                        placeholder="Buscar usuarios"
+                        [value]="searchValue"
+                        (input)="onSearch($event)"
+                    />
+                </p-iconfield>
+                <p-button
+                    *ngIf="searchTerm()"
+                    label="Limpiar"
+                    icon="pi pi-times"
+                    severity="secondary"
+                    text
+                    (click)="clearSearch()"
+                    class="md:w-auto"
+                />
+                <p-button label="Agregar" icon="pi pi-plus" (click)="addUser()" class="md:w-auto" />
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #header>
+        <tr>
+            <th style="min-width: 10rem">Nombre</th>
+            <th style="min-width: 10rem">Apellido</th>
+            <th style="min-width: 10rem">Usuario</th>
+            <th style="min-width: 14rem">Email</th>
+            <th style="width: 12rem">Acciones</th>
+        </tr>
+    </ng-template>
+
+    <ng-template #body let-user>
+        <tr>
+            <td>{{ user.personalData?.name || '' }}</td>
+            <td>{{ user.personalData?.lastname || '' }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+                <div class="flex flex-wrap gap-2">
+                    <p-button
+                        label="Editar"
+                        icon="pi pi-pencil"
+                        outlined
+                        size="small"
+                        (click)="editUser(user)"
+                    />
+                    <p-button
+                        label="Eliminar"
+                        icon="pi pi-trash"
+                        severity="danger"
+                        outlined
+                        size="small"
+                        (click)="deleteUser(user)"
+                    />
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+        <tr>
+            <td colspan="5" class="py-6 text-center text-surface-500 dark:text-surface-400">
+                No se encontraron usuarios.
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<p-dialog
+    [(visible)]="userDialog"
+    [modal]="true"
+    [style]="{ width: '40rem' }"
+    [breakpoints]="{ '960px': '90vw', '640px': '95vw' }"
+    [dismissableMask]="true"
+    (onHide)="hideDialog()"
+    [header]="isEditMode ? 'Editar usuario' : 'Agregar usuario'"
+>
+    <ng-template #content>
+        <form [formGroup]="userForm" (ngSubmit)="saveUser()" class="flex flex-col gap-4">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                    <label for="username" class="block font-semibold mb-2">Usuario</label>
+                    <input id="username" type="text" pInputText formControlName="username" fluid />
+                    <small class="text-red-500" *ngIf="isInvalid('username')">
+                        El usuario es obligatorio.
+                    </small>
+                </div>
+                <div>
+                    <label for="email" class="block font-semibold mb-2">Email</label>
+                    <input id="email" type="email" pInputText formControlName="email" fluid />
+                    <small class="text-red-500" *ngIf="isInvalid('email')">
+                        Ingrese un email válido.
+                    </small>
+                </div>
+                <div>
+                    <label for="role" class="block font-semibold mb-2">Rol</label>
+                    <p-select
+                        inputId="role"
+                        formControlName="role"
+                        [options]="roleOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Seleccione un rol"
+                        class="w-full"
+                    />
+                    <small class="text-red-500" *ngIf="isInvalid('role')">
+                        Seleccione un rol.
+                    </small>
+                </div>
+                <div class="flex items-center gap-2 pt-6">
+                    <p-checkbox
+                        inputId="isFirstLogin"
+                        formControlName="isFirstLogin"
+                        [binary]="true"
+                        label="Primer inicio de sesión"
+                    />
+                </div>
+                <div *ngIf="!isEditMode" class="md:col-span-2">
+                    <label for="password" class="block font-semibold mb-2">Contraseña</label>
+                    <input id="password" type="password" pInputText formControlName="password" fluid />
+                    <small class="text-red-500" *ngIf="isInvalid('password')">
+                        La contraseña es obligatoria y debe tener al menos 8 caracteres.
+                    </small>
+                </div>
+            </div>
+
+            <div formGroupName="personalData" class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                    <label for="name" class="block font-semibold mb-2">Nombre</label>
+                    <input id="name" type="text" pInputText formControlName="name" fluid />
+                </div>
+                <div>
+                    <label for="lastname" class="block font-semibold mb-2">Apellido</label>
+                    <input id="lastname" type="text" pInputText formControlName="lastname" fluid />
+                </div>
+                <div>
+                    <label for="dni" class="block font-semibold mb-2">DNI</label>
+                    <input id="dni" type="text" pInputText formControlName="dni" fluid />
+                </div>
+                <div>
+                    <label for="phone" class="block font-semibold mb-2">Teléfono</label>
+                    <input id="phone" type="text" pInputText formControlName="phone" fluid />
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+                <p-button type="button" label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
+                <p-button
+                    type="submit"
+                    [label]="isEditMode ? 'Guardar cambios' : 'Crear usuario'"
+                    icon="pi pi-check"
+                />
+            </div>
+        </form>
+    </ng-template>
+</p-dialog>
