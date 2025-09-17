@@ -15,6 +15,7 @@ import { Select } from 'primeng/select';
 import { RippleModule } from 'primeng/ripple';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { CompaniesService, Company, CompanyStatus } from '@/pages/service/companies.service';
+import { CardModule } from "primeng/card";
 
 interface CompanyStatusOption {
     label: string;
@@ -27,21 +28,22 @@ interface CompanyStatusOption {
     templateUrl: './companies.html',
     styleUrl: './companies.scss',
     imports: [
-        CommonModule,
-        TableModule,
-        FormsModule,
-        ButtonModule,
-        TagModule,
-        InputTextModule,
-        IconFieldModule,
-        InputIconModule,
-        DialogModule,
-        TextareaModule,
-        ToastModule,
-        ConfirmDialogModule,
-        Select,
-        RippleModule
-    ],
+    CommonModule,
+    TableModule,
+    FormsModule,
+    ButtonModule,
+    TagModule,
+    InputTextModule,
+    IconFieldModule,
+    InputIconModule,
+    DialogModule,
+    TextareaModule,
+    ToastModule,
+    ConfirmDialogModule,
+    Select,
+    RippleModule,
+    CardModule
+],
     providers: [MessageService, ConfirmationService, CompaniesService]
 })
 export class Companies implements OnInit {
@@ -121,6 +123,17 @@ export class Companies implements OnInit {
                 return 'Inactiva';
             default:
                 return status;
+        }
+    }
+
+    getRoleLabel(role: string) {
+        switch (role) {
+            case 'ADMIN':
+                return 'Administrador';
+            case 'EMPLOYEE':
+                return 'Empleado';
+            default:
+                return role || 'Empleado';
         }
     }
 

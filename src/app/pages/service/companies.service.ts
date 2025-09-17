@@ -20,6 +20,7 @@ export interface CompanyContact {
     name: string;
     lastname: string;
     dni: string;
+    phone: string;
     user: CompanyContactUser;
     __v: number;
 }
@@ -49,9 +50,9 @@ export interface UpdateCompanyPayload {
 @Injectable()
 export class CompaniesService {
     private readonly apiUrl = environment.backendUrl;
-    private readonly companiesEndpoint = `${this.apiUrl}/private/company`;
+    private readonly companiesEndpoint = `${this.apiUrl}/private/companies`;
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient) { }
 
     getCompanies(page: number = 1, limit: number = 10, search?: string) {
         let params = new HttpParams().set('page', page).set('limit', limit);
@@ -67,5 +68,13 @@ export class CompaniesService {
 
     deleteCompany(companyId: string) {
         return this.http.delete(`${this.companiesEndpoint}/${companyId}`);
+    }
+
+    addUserToCompany(companyId: string, personId: string) {
+        return this.http.post(`${this.companiesEndpoint}/${companyId}/contacts`, { personId });
+    }
+
+    removeUserFromCompany(companyId: string, userId: string) {
+        return this.http.delete(`${this.companiesEndpoint}/${companyId}/contacts/${userId}`);
     }
 }
