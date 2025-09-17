@@ -12,6 +12,7 @@ export interface Feedback {
     firstName: string;
     email: string;
     description: string;
+    caseNumber: string;
     phone: string;
     type: FeedbackType;
     contacted: boolean;

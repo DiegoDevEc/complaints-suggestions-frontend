@@ -31,7 +31,8 @@
                 <div class="card-body">
                     <div class="card-heading">
                         <div class="card-heading-info">
-                            <h3>{{ complaint.firstName }} {{ complaint.lastName }}</h3>
+                            <h3> {{complaint.caseNumber}} </h3>
+                            <span> {{ complaint.firstName }} {{ complaint.lastName }}</span>
                             <span class="type-chip" [ngClass]="getTypeClass(complaint.type)">
                                 {{ getTypeDescription(complaint.type) }}
                             </span>

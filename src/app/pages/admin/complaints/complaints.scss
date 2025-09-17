@@ -48,9 +48,13 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.75rem;
+    max-width: 1000px;
+    /* límite para que no se estire */
+    margin: 0 auto;
 }
 
 .complaint-card {
+    width: 300px;
     background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
     border-radius: 1.25rem;
     border: 1px solid rgba(148, 163, 184, 0.25);
