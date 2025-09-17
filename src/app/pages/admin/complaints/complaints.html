@@ -1,60 +1,141 @@
-<p-table #dt [value]="complaints()" [columns]="cols" [paginator]="true" [rows]="10" [totalRecords]="totalRecords"
-    [lazy]="true" (onLazyLoad)="loadComplaintsLazy($event)" dataKey="_id"
-    currentPageReportTemplate="Del {first} al {last} de {totalRecords} quejas" [showCurrentPageReport]="true"
-    [rowsPerPageOptions]="[10, 20, 30]">
-    <ng-template #caption>
-        <div class="flex items-center justify-between">
-            <h5 class="m-0">Denuncias, Quejas o Sugerencias Ciudadanas</h5>
-            <p-iconfield>
-                <p-inputicon styleClass="pi pi-search" />
-                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
-            </p-iconfield>
+<div class="complaints-page">
+    <div class="page-header">
+        <div class="page-title">
+            <h2>Denuncias, Quejas o Sugerencias Ciudadanas</h2>
+            <p>Administra los casos recibidos y da seguimiento a su estado.</p>
+        </div>
+        <p-iconfield class="search-field">
+            <p-inputicon styleClass="pi pi-search" />
+            <input pInputText type="text" placeholder="Buscar por nombre, estado o detalle"
+                [value]="searchTerm()" (input)="onSearch($event)" />
+        </p-iconfield>
+    </div>
+
+    <div class="results-summary">
+        <span>Mostrando {{ filteredComplaints().length }} de {{ totalRecords }} registros</span>
+    </div>
+
+    <ng-container *ngIf="filteredComplaints().length; else emptyState">
+        <div class="complaints-grid">
+            <article class="complaint-card" *ngFor="let complaint of filteredComplaints(); trackBy: trackById">
+                <div class="card-media" [class.clickable]="getAttachmentUrl(complaint)"
+                    (click)="openImageDialog(complaint)">
+                    <ng-container *ngIf="getAttachmentUrl(complaint) as imageUrl; else noImage">
+                        <img [src]="imageUrl" alt="Evidencia adjunta" />
+                    </ng-container>
+                    <ng-template #noImage>
+                        <p-avatar icon="pi pi-image" shape="circle" styleClass="placeholder-avatar" />
+                    </ng-template>
+                </div>
+
+                <div class="card-body">
+                    <div class="card-heading">
+                        <div class="card-heading-info">
+                            <h3> {{complaint.caseNumber}} </h3>
+                            <span> {{ complaint.firstName }} {{ complaint.lastName }}</span>
+                            <span class="type-chip" [ngClass]="getTypeClass(complaint.type)">
+                                {{ getTypeDescription(complaint.type) }}
+                            </span>
+                        </div>
+                        <p-tag [value]="getDescriptionStatus(complaint.status)"
+                            [severity]="getSeverity(complaint.status)" />
+                    </div>
+
+                    <p class="card-description">
+                        {{ getShortDescription(complaint.description) }}
+                    </p>
+
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <i class="pi pi-envelope"></i>
+                            <span>{{ complaint.email || 'Sin correo registrado' }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="pi pi-phone"></i>
+                            <span>{{ complaint.phone || 'Sin teléfono registrado' }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="pi pi-calendar"></i>
+                            <span>{{ formatDate(complaint.dateRegister) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <p-button label="Ver" icon="pi pi-eye" severity="info" [outlined]="true" class="action-button"
+                        (click)="viewComplaints(complaint)" />
+                    <p-button label="Editar" icon="pi pi-pencil" [outlined]="true" class="action-button"
+                        (click)="editComplaints(complaint)" />
+                    <p-button label="Eliminar" icon="pi pi-trash" severity="danger" [outlined]="true"
+                        class="action-button" (click)="cancelFeedback(complaint)" />
+                </div>
+            </article>
+        </div>
+    </ng-container>
+
+    <ng-template #emptyState>
+        <div class="empty-state">
+            <i class="pi pi-inbox"></i>
+            <p>No se encontraron denuncias para mostrar.</p>
         </div>
     </ng-template>
-    <ng-template #header>
-        <tr>
-            <th style="min-width: 10rem">Imagen</th>
-            <th pSortableColumn="name" style="min-width: 10rem">Nombre</th>
-            <th pSortableColumn="category" style="min-width: 8rem">Apellido</th>
-            <th pSortableColumn="category" style="min-width: 8rem">Teléfono</th>
-            <th pSortableColumn="category" style="min-width: 8rem">Email</th>
-            <th pSortableColumn="name" style="min-width: 8rem">Tipo</th>
-            <th pSortableColumn="inventoryStatus" style="min-width: 12rem">Estado</th>
-            <th style="min-width: 12rem"></th>
-        </tr>
-    </ng-template>
-    <ng-template #body let-complaints>
-        <tr>
-            <td>
-                <ng-container *ngIf="getAttachmentUrl(complaints) as imageUrl; else noImage">
-                    <img [src]="imageUrl" alt="Evidencia" class="w-16 h-16 object-cover rounded cursor-pointer"
-                        (click)="openImageDialog(complaints)" />
-                </ng-container>
-                <ng-template #noImage>
-                    <span class="material-icons text-gray-400 text-4xl">image_not_supported</span>
-                </ng-template>
-            </td>
-            <td style="min-width: 10rem">{{ complaints.firstName }}</td>
-            <td>{{ complaints.lastName }}</td>
-            <td>{{ complaints.phone }}</td>
-            <td>{{ complaints.email }}</td>
-            <td [ngClass]="getTypeClass(complaints.type)">
-                {{ getTypeDescription(complaints.type) }}
-            </td>
-            <td>
-                <p-tag [value]="getDescriptionStatus(complaints.status)" [severity]="getSeverity(complaints.status)" />
-            </td>
-            <td>
-                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                    (click)="editComplaints(complaints)" />
-                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                    (click)="cancelFeedback(complaints)" />
-            </td>
-        </tr>
-    </ng-template>
-</p-table>
 
-<p-dialog [(visible)]="complaintsDialog" [style]="{ width: '450px' }" header="Detalle de la Queja" [modal]="true">
+    <p-paginator *ngIf="totalRecords > rowsPerPageOptions[0]" [first]="first" [rows]="rows"
+        [totalRecords]="totalRecords" [rowsPerPageOptions]="rowsPerPageOptions" (onPageChange)="onPageChange($event)" />
+</div>
+
+<p-dialog [(visible)]="viewDialogVisible" [style]="{ width: '520px' }" header="Detalle de la Queja" [modal]="true"
+    (onHide)="closeViewDialog()">
+    <ng-template #content>
+        <div *ngIf="viewFeedback as complaint" class="view-dialog">
+            <div class="view-dialog__status">
+                <p-tag [value]="getDescriptionStatus(complaint.status)"
+                    [severity]="getSeverity(complaint.status)" />
+                <span class="type-chip" [ngClass]="getTypeClass(complaint.type)">
+                    {{ getTypeDescription(complaint.type) }}
+                </span>
+            </div>
+
+            <div class="view-dialog__grid">
+                <div class="view-dialog__item">
+                    <span class="label">Denunciante</span>
+                    <span class="value">{{ complaint.firstName }} {{ complaint.lastName }}</span>
+                </div>
+                <div class="view-dialog__item">
+                    <span class="label">Correo</span>
+                    <span class="value">{{ complaint.email || 'Sin correo registrado' }}</span>
+                </div>
+                <div class="view-dialog__item">
+                    <span class="label">Teléfono</span>
+                    <span class="value">{{ complaint.phone || 'Sin teléfono registrado' }}</span>
+                </div>
+                <div class="view-dialog__item">
+                    <span class="label">Fecha de registro</span>
+                    <span class="value">{{ formatDate(complaint.dateRegister) }}</span>
+                </div>
+            </div>
+
+            <div class="view-dialog__description">
+                <span class="label">Descripción</span>
+                <p>{{ complaint.description || 'Sin descripción proporcionada.' }}</p>
+            </div>
+
+            <div class="view-dialog__attachment" *ngIf="getAttachmentUrl(complaint) as imageUrl">
+                <span class="label">Adjunto</span>
+                <div class="attachment-preview" (click)="openImageDialog(complaint)">
+                    <img [src]="imageUrl" alt="Adjunto de la denuncia" />
+                    <span>Ver imagen</span>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cerrar" icon="pi pi-times" text (click)="closeViewDialog()" />
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="complaintsDialog" [style]="{ width: '450px' }" header="Actualizar estado" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
             <div>
@@ -68,7 +149,7 @@
                     readonly />
             </div>
             <div>
-                <label for="description" class="block font-bold mb-3">Description</label>
+                <label for="description" class="block font-bold mb-3">Descripción</label>
                 <textarea id="description" pTextarea [(ngModel)]="feedback.description" required rows="3" cols="20"
                     fluid readonly></textarea>
             </div>
