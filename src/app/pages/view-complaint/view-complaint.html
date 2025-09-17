@@ -1,1 +1,96 @@
-<p>view-complaint works!</p>
+<div class="view-complaint-page">
+    <section class="search-panel glass-card">
+        <div class="search-header">
+            <h1>Buscador de casos</h1>
+            <p>Consulta el estado de tu reporte ingresando el número de caso asignado.</p>
+        </div>
+
+        <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form" novalidate>
+            <div class="input-group">
+                <label for="caseNumber">Número de caso</label>
+                <div class="input-wrapper"
+                    [class.input-invalid]="searchForm.controls.caseNumber.invalid && (searchForm.controls.caseNumber.dirty || searchForm.controls.caseNumber.touched)">
+                    <input id="caseNumber" type="text" formControlName="caseNumber" placeholder="Ej. FB-250909-224953"
+                        autocomplete="off" inputmode="text" aria-describedby="caseNumberHelp" />
+                </div>
+                <small id="caseNumberHelp" class="input-hint"> Ingresa el número tal como aparece en el correo de
+                    confirmación. </small>
+                <small class="input-error"
+                    *ngIf="searchForm.controls.caseNumber.hasError('required') && (searchForm.controls.caseNumber.dirty || searchForm.controls.caseNumber.touched)">
+                    El número de caso es obligatorio. </small>
+                <small class="input-error"
+                    *ngIf="(searchForm.controls.caseNumber.hasError('minlength') || searchForm.controls.caseNumber.hasError('pattern')) && (searchForm.controls.caseNumber.dirty || searchForm.controls.caseNumber.touched)">
+                    Verifica que el formato del caso sea válido.
+                </small>
+            </div>
+
+            <button class="search-button" pButton pRipple type="submit" [disabled]="searchForm.invalid || loading" [rounded]="true"
+                [text]="true">
+                <ng-container *ngIf="!loading; else loadingLabel">Buscar</ng-container>
+            </button>
+
+            <button class="search-button" pButton pRipple label="Cancelar" routerLink="/" [rounded]="true" [text]="true" severity="danger">
+            </button>
+
+            <ng-template #loadingLabel>
+                <span class="loading-content">
+                    <span class="loader" aria-hidden="true"></span>
+                    Buscando...
+                </span>
+            </ng-template>
+        </form>
+
+        <p class="feedback-message error" *ngIf="errorMessage">{{ errorMessage }}</p>
+        <p class="feedback-message muted" *ngIf="notFound && !errorMessage">No se encontró ningún caso con ese número.
+        </p>
+    </section>
+
+    <section class="result-section" *ngIf="feedback as case">
+        <article class="feedback-card glass-card">
+            <header class="card-header">
+                <div class="status-badge" [ngClass]="getStatusClass(case.status)">{{ getStatusLabel(case.status) }}
+                </div>
+                <div class="case-identifiers">
+                    <span class="case-label">Caso</span>
+                    <span class="case-number">{{ case.caseNumber }}</span>
+                </div>
+            </header>
+
+            <div class="card-body">
+                <div class="profile">
+                    <div class="avatar" aria-hidden="true">{{ getInitials(case) }}</div>
+                    <div class="profile-info">
+                        <h2>{{ getFullName(case) }}</h2>
+                        <p class="contact" *ngIf="case.email">
+                            <span class="icon" aria-hidden="true">✉️</span>
+                            {{ case.email }}
+                        </p>
+                        <p class="contact" *ngIf="case.phone">
+                            <span class="icon" aria-hidden="true">📞</span>
+                            {{ case.phone }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-block">
+                        <h3>Descripción del caso</h3>
+                        <p>{{ case.description || 'Sin descripción disponible.' }}</p>
+                    </div>
+                    <div class="info-block">
+                        <h3>Dirección</h3>
+                        <p>{{ case.address || 'Sin dirección registrada.' }}</p>
+                    </div>
+                    <div class="info-block">
+                        <h3>Fecha de registro</h3>
+                        <p>{{ formatDate(case.dateRegister) }}</p>
+                    </div>
+                </div>
+
+                <div class="image-wrapper" *ngIf="case.attachmentUrl">
+                    <img [src]="case.attachmentUrl" alt="Imagen adjunta al caso" loading="lazy" />
+                </div>
+            </div>
+        </article>
+    </section>
+</div>
