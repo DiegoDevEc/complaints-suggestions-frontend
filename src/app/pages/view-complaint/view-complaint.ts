@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
 import { firstValueFrom } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
@@ -23,7 +25,7 @@ interface ViewFeedback {
 @Component({
     selector: 'app-view-complaint',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, ButtonModule],
     templateUrl: './view-complaint.html',
     styleUrl: './view-complaint.scss'
 })

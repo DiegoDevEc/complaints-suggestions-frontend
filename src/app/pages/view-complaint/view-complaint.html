@@ -8,19 +8,30 @@
         <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form" novalidate>
             <div class="input-group">
                 <label for="caseNumber">Número de caso</label>
-                <div class="input-wrapper" [class.input-invalid]="searchForm.controls.caseNumber.invalid && (searchForm.controls.caseNumber.dirty || searchForm.controls.caseNumber.touched)">
-                    <input id="caseNumber" type="text" formControlName="caseNumber" placeholder="Ej. FB-250909-224953" autocomplete="off" inputmode="text" aria-describedby="caseNumberHelp" />
+                <div class="input-wrapper"
+                    [class.input-invalid]="searchForm.controls.caseNumber.invalid && (searchForm.controls.caseNumber.dirty || searchForm.controls.caseNumber.touched)">
+                    <input id="caseNumber" type="text" formControlName="caseNumber" placeholder="Ej. FB-250909-224953"
+                        autocomplete="off" inputmode="text" aria-describedby="caseNumberHelp" />
                 </div>
-                <small id="caseNumberHelp" class="input-hint"> Ingresa el número tal como aparece en el correo de confirmación. </small>
-                <small class="input-error" *ngIf="searchForm.controls.caseNumber.hasError('required') && (searchForm.controls.caseNumber.dirty || searchForm.controls.caseNumber.touched)"> El número de caso es obligatorio. </small>
-                <small class="input-error" *ngIf="(searchForm.controls.caseNumber.hasError('minlength') || searchForm.controls.caseNumber.hasError('pattern')) && (searchForm.controls.caseNumber.dirty || searchForm.controls.caseNumber.touched)">
+                <small id="caseNumberHelp" class="input-hint"> Ingresa el número tal como aparece en el correo de
+                    confirmación. </small>
+                <small class="input-error"
+                    *ngIf="searchForm.controls.caseNumber.hasError('required') && (searchForm.controls.caseNumber.dirty || searchForm.controls.caseNumber.touched)">
+                    El número de caso es obligatorio. </small>
+                <small class="input-error"
+                    *ngIf="(searchForm.controls.caseNumber.hasError('minlength') || searchForm.controls.caseNumber.hasError('pattern')) && (searchForm.controls.caseNumber.dirty || searchForm.controls.caseNumber.touched)">
                     Verifica que el formato del caso sea válido.
                 </small>
             </div>
 
-            <button type="submit" [disabled]="searchForm.invalid || loading" class="search-button">
+            <button class="search-button" pButton pRipple type="submit" [disabled]="searchForm.invalid || loading" [rounded]="true"
+                [text]="true">
                 <ng-container *ngIf="!loading; else loadingLabel">Buscar</ng-container>
             </button>
+
+            <button class="search-button" pButton pRipple label="Cancelar" routerLink="/" [rounded]="true" [text]="true" severity="danger">
+            </button>
+
             <ng-template #loadingLabel>
                 <span class="loading-content">
                     <span class="loader" aria-hidden="true"></span>
@@ -30,13 +41,15 @@
         </form>
 
         <p class="feedback-message error" *ngIf="errorMessage">{{ errorMessage }}</p>
-        <p class="feedback-message muted" *ngIf="notFound && !errorMessage">No se encontró ningún caso con ese número.</p>
+        <p class="feedback-message muted" *ngIf="notFound && !errorMessage">No se encontró ningún caso con ese número.
+        </p>
     </section>
 
     <section class="result-section" *ngIf="feedback as case">
         <article class="feedback-card glass-card">
             <header class="card-header">
-                <div class="status-badge" [ngClass]="getStatusClass(case.status)">{{ getStatusLabel(case.status) }}</div>
+                <div class="status-badge" [ngClass]="getStatusClass(case.status)">{{ getStatusLabel(case.status) }}
+                </div>
                 <div class="case-identifiers">
                     <span class="case-label">Caso</span>
                     <span class="case-number">{{ case.caseNumber }}</span>
