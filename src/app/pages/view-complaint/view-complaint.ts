@@ -7,7 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { firstValueFrom } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-type KnownStatus = 'PENDING' | 'RESOLVED' | 'IN_PROGRESS' | 'CANCEL';
+type KnownStatus = 'PENDING' | 'RESOLVED' | 'IN_PROGRESS' | 'CANCEL' | 'RETURNED' | 'FORWARDED';
 
 interface StatusHistoryUser {
     name: string | null;
@@ -57,7 +57,9 @@ export class ViewComplaint {
         PENDING: 'Pendiente',
         RESOLVED: 'Resuelto',
         IN_PROGRESS: 'En progreso',
-        CANCEL: 'Cancelado'
+        CANCEL: 'Cancelado',
+        RETURNED: 'Devuelto',
+        FORWARDED: 'Derivado'
     };
 
     loading = false;
@@ -310,14 +312,16 @@ export class ViewComplaint {
 
                 const source = entry as Record<string, unknown>;
                 const status = this.toNullableString(
-                    source.status ?? source.state ?? source.statusName ?? source.newStatus ?? source.value
+                    source['status'] ?? source['state'] ?? source['statusName'] ?? source['newStatus'] ?? source['value']
+
                 );
                 const changedAt = this.toNullableString(
-                    source.changedAt ?? source.date ?? source.createdAt ?? source.updatedAt ?? source.timestamp
+                    source['changedAt'] ?? source['date'] ?? source['createdAt'] ?? source['updatedAt'] ?? source['timestamp']
+
                 );
-                const note = this.toNullableString(source.note ?? source.description ?? source.comment ?? source.detail);
+                const note = this.toNullableString(source['note'] ?? source['description'] ?? source['comment'] ?? source['detail']);
                 const changedBy = this.mapStatusHistoryUser(
-                    source.changedBy ?? source.user ?? source.updatedBy ?? source.modifiedBy ?? source.assignedTo
+                    source['changedBy'] ?? source['user'] ?? source['updatedBy'] ?? source['modifiedBy'] ?? source['assignedTo']
                 );
 
                 if (!status && !changedAt && !note && !changedBy) {
@@ -379,12 +383,12 @@ export class ViewComplaint {
         }
 
         const source = raw as Record<string, unknown>;
-        const fullName = this.toNullableString(source.fullName ?? source.displayName ?? source.username);
-        const name = this.toNullableString(source.name ?? source.firstName ?? source.names) ?? fullName;
-        const lastname = this.toNullableString(source.lastname ?? source.lastName ?? source.surname ?? source.secondName);
-        const email = this.toNullableString(source.email ?? source.emailAddress ?? source.mail);
+        const fullName = this.toNullableString(source['fullName'] ?? source['displayName'] ?? source['username']);
+        const name = this.toNullableString(source['name'] ?? source['firstName'] ?? source['names']) ?? fullName;
+        const lastname = this.toNullableString(source['lastname'] ?? source['lastName'] ?? source['surname'] ?? source['secondName']);
+        const email = this.toNullableString(source['email'] ?? source['emailAddress'] ?? source['mail']);
         const phone = this.toNullableString(
-            source.phone ?? source.phoneNumber ?? source.telephone ?? source.mobile ?? source.cellphone
+            source['phone'] ?? source['phoneNumber'] ?? source['telephone'] ?? source['mobile'] ?? source['cellphone']
         );
 
         if (!name && !lastname && !email && !phone) {

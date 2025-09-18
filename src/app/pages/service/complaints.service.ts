@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 
-export type FeedbackStatus = 'PENDING' | 'RESOLVED' | 'IN_PROGRESS' | 'CANCEL';
+export type FeedbackStatus = 'PENDING' | 'RESOLVED' | 'IN_PROGRESS' | 'CANCEL' | 'RETURNED' | 'FORWARDED';
 export type FeedbackType = 'complaint' | 'compliment' | 'suggestion';
 
 export interface Feedback {

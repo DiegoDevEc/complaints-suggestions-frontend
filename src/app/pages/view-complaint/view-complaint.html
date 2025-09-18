@@ -109,11 +109,11 @@
                                     <p class="timeline-contact" *ngIf="event.changedBy?.email || event.changedBy?.phone">
                                         <span *ngIf="event.changedBy?.email">
                                             <span class="icon" aria-hidden="true">✉️</span>
-                                            {{ event.changedBy.email }}
+                                            {{ event.changedBy?.email }}
                                         </span>
                                         <span *ngIf="event.changedBy?.phone">
                                             <span class="icon" aria-hidden="true">📞</span>
-                                            {{ event.changedBy.phone }}
+                                            {{ event.changedBy?.phone }}
                                         </span>
                                     </p>
                                     <p class="timeline-note" *ngIf="event.note">
