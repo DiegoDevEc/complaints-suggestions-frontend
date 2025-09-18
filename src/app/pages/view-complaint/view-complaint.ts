@@ -6,6 +6,7 @@ import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { firstValueFrom } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { NotificationsService } from '../service/notification.service';
 
 type KnownStatus = 'PENDING' | 'RESOLVED' | 'IN_PROGRESS' | 'CANCEL' | 'RETURNED' | 'FORWARDED';
 
@@ -67,6 +68,16 @@ export class ViewComplaint {
     errorMessage = '';
     feedback: ViewFeedback | null = null;
 
+    constructor(private socketService: NotificationsService) {
+        this.socketService.onFeedbackStatusUpdated().subscribe((update) => {
+
+            if (this.feedback && this.feedback.caseNumber === update.caseNumber) {
+                this.feedback = update;
+            }
+
+        });
+    }
+
     async onSearch() {
         if (this.searchForm.invalid) {
             this.searchForm.markAllAsTouched();
@@ -77,7 +88,6 @@ export class ViewComplaint {
         this.notFound = false;
         this.errorMessage = '';
         this.feedback = null;
-
         const caseNumber = this.searchForm.controls.caseNumber.value.trim();
 
         try {
