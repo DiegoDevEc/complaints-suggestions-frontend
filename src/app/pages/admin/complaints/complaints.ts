@@ -19,6 +19,7 @@ import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 import { ImagePreviewDialogComponent } from '@/shared/components/image-preview-dialog/image-preview-dialog.component';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { AvatarModule } from 'primeng/avatar';
+import { NotificationsService } from '@/pages/service/notification.service';
 
 @Component({
     selector: 'app-complaints',
@@ -100,12 +101,23 @@ export class Complaints implements OnInit {
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
         private complaintsService: ComplaintsService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private socketService: NotificationsService
     ) { }
 
     ngOnInit() {
         this.loadComplaintsLazy({ first: 0, rows: 10 });
-        // this.loadData();
+
+        this.socketService.onFeedbackStatusUpdated().subscribe((update) => {
+            const current = this.complaints();
+            const index = current.findIndex(c => c._id === update._id);
+            if (index !== -1) {
+                const newList = [...current];
+                newList[index] = { ...newList[index], status: update.status };
+                this.complaints.set(newList);
+            }
+        });
+
     }
 
     loadComplaintsLazy(event: Partial<PaginatorState>) {
