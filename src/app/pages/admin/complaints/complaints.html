@@ -59,9 +59,24 @@
                             <span>{{ formatDate(complaint.dateRegister) }}</span>
                         </div>
                     </div>
+
+                    <div class="company-info">
+                        <span class="company-info__label">Empresa asignada</span>
+                        <ng-container *ngIf="complaint.company; else noAssignedCompany">
+                            <span class="company-info__name">{{ complaint.company.name }}</span>
+                            <p class="company-info__description">
+                                {{ complaint.company.description || 'Sin descripción disponible.' }}
+                            </p>
+                        </ng-container>
+                        <ng-template #noAssignedCompany>
+                            <span class="company-info__empty">Sin empresa asignada</span>
+                        </ng-template>
+                    </div>
                 </div>
 
                 <div class="card-actions">
+                    <p-button label="Asignar empresa" icon="pi pi-briefcase" [outlined]="true"
+                        class="action-button" (click)="openAssignCompanyDialog(complaint)" />
                     <p-button  icon="pi pi-eye" severity="info" [outlined]="true" class="action-button"
                         (click)="viewComplaints(complaint)" />
                     <p-button  icon="pi pi-pencil" [outlined]="true" class="action-button"
@@ -120,6 +135,17 @@
                 <p>{{ complaint.description || 'Sin descripción proporcionada.' }}</p>
             </div>
 
+            <div class="view-dialog__company">
+                <span class="label">Empresa asignada</span>
+                <ng-container *ngIf="complaint.company; else noCompanyView">
+                    <span class="value">{{ complaint.company.name }}</span>
+                    <p>{{ complaint.company.description || 'Sin descripción disponible.' }}</p>
+                </ng-container>
+                <ng-template #noCompanyView>
+                    <span class="value view-dialog__company-empty">Sin empresa asignada</span>
+                </ng-template>
+            </div>
+
             <div class="view-dialog__attachment" *ngIf="getAttachmentUrl(complaint) as imageUrl">
                 <span class="label">Adjunto</span>
                 <div class="attachment-preview" (click)="openImageDialog(complaint)">
@@ -132,6 +158,84 @@
 
     <ng-template #footer>
         <p-button label="Cerrar" icon="pi pi-times" text (click)="closeViewDialog()" />
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="assignCompanyDialog" [style]="{ width: '540px' }" header="Asignar empresa"
+    [modal]="true" (onHide)="closeAssignCompanyDialog()">
+    <ng-template #content>
+        <div class="assign-dialog" *ngIf="assigningFeedback as target">
+            <div class="assign-dialog__header">
+                <span class="assign-dialog__case">Caso {{ target.caseNumber }}</span>
+                <span class="assign-dialog__reporter">{{ target.firstName }} {{ target.lastName }}</span>
+            </div>
+
+            <div class="assign-dialog__section">
+                <h4>Seleccionar empresa existente</h4>
+                <p>Elige una empresa registrada para vincularla con el caso.</p>
+
+                <p-select [(ngModel)]="selectedCompanyId" [options]="companyOptions()" optionLabel="label"
+                    optionValue="value" placeholder="Seleccione una empresa" class="w-full"
+                    [disabled]="isLoadingCompanies">
+                </p-select>
+
+                <div class="assign-dialog__helper" *ngIf="isLoadingCompanies">
+                    <i class="pi pi-spinner pi-spin"></i>
+                    <span>Cargando empresas...</span>
+                </div>
+
+                <ng-container *ngIf="!isLoadingCompanies && !companyOptions().length">
+                    <div class="assign-dialog__helper assign-dialog__helper--empty">
+                        <i class="pi pi-briefcase"></i>
+                        <span>No hay empresas registradas.</span>
+                    </div>
+                </ng-container>
+
+                <ng-container *ngIf="getSelectedCompany() as selectedCompany">
+                    <div class="assign-dialog__company-preview">
+                        <span class="assign-dialog__company-name">{{ selectedCompany.name }}</span>
+                        <p class="assign-dialog__company-description">
+                            {{ selectedCompany.description || 'Sin descripción disponible.' }}
+                        </p>
+                    </div>
+                </ng-container>
+
+                <p-button label="Asignar empresa" icon="pi pi-check" class="assign-dialog__action"
+                    (click)="assignSelectedCompany()" [disabled]="!selectedCompanyId || isAssigningCompany"
+                    [loading]="isAssigningCompany" />
+            </div>
+
+            <div class="assign-dialog__divider">
+                <span>o</span>
+            </div>
+
+            <div class="assign-dialog__section">
+                <h4>Crear nueva empresa</h4>
+                <p>Registra una empresa y asígnala inmediatamente al caso.</p>
+
+                <div class="assign-dialog__field">
+                    <label for="newCompanyName">Nombre</label>
+                    <input id="newCompanyName" type="text" pInputText [(ngModel)]="newCompanyName"
+                        [disabled]="isCreatingCompany || isAssigningCompany" fluid />
+                </div>
+
+                <div class="assign-dialog__field">
+                    <label for="newCompanyDescription">Descripción</label>
+                    <textarea id="newCompanyDescription" pTextarea rows="3"
+                        [(ngModel)]="newCompanyDescription"
+                        [disabled]="isCreatingCompany || isAssigningCompany" fluid></textarea>
+                </div>
+
+                <p-button label="Crear y asignar" icon="pi pi-plus" class="assign-dialog__action"
+                    (click)="createAndAssignCompany()"
+                    [disabled]="!canCreateCompany() || isCreatingCompany || isAssigningCompany"
+                    [loading]="isCreatingCompany" />
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cerrar" icon="pi pi-times" text (click)="closeAssignCompanyDialog()" />
     </ng-template>
 </p-dialog>
 

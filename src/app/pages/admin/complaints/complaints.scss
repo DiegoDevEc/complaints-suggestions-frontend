@@ -194,6 +194,42 @@
     }
 }
 
+.company-info {
+    margin-top: 1rem;
+    padding: 0.9rem 1rem;
+    border-radius: 1rem;
+    background: rgba(79, 70, 229, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.company-info__label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #6366f1;
+    font-weight: 600;
+}
+
+.company-info__name {
+    font-weight: 600;
+    color: #111827;
+}
+
+.company-info__description {
+    margin: 0;
+    color: #4b5563;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.company-info__empty {
+    color: #94a3b8;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
 .card-actions {
     display: flex;
     flex-wrap: wrap;
@@ -280,6 +316,35 @@
     }
 }
 
+.view-dialog__company {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #94a3b8;
+    }
+
+    .value {
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    p {
+        margin: 0;
+        color: #4b5563;
+        line-height: 1.6;
+    }
+}
+
+.view-dialog__company-empty {
+    color: #94a3b8;
+    font-style: italic;
+}
+
 .view-dialog__attachment {
     display: flex;
     flex-direction: column;
@@ -326,6 +391,146 @@
     }
 }
 
+.assign-dialog {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.assign-dialog__header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    color: #4b5563;
+    font-size: 0.9rem;
+
+    .assign-dialog__reporter {
+        color: #6b7280;
+        font-size: 0.85rem;
+    }
+}
+
+.assign-dialog__case {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 1rem;
+}
+
+.assign-dialog__section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 1.1rem;
+    border-radius: 1rem;
+    background: #f8fafc;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+
+    h4 {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+}
+
+.assign-dialog__helper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #6366f1;
+}
+
+.assign-dialog__helper--empty {
+    justify-content: center;
+    color: #94a3b8;
+
+    i {
+        color: inherit;
+    }
+}
+
+.assign-dialog__company-preview {
+    padding: 0.9rem 1rem;
+    border-radius: 0.85rem;
+    background: rgba(79, 70, 229, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.assign-dialog__company-name {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.assign-dialog__company-description {
+    margin: 0;
+    color: #4b5563;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.assign-dialog__divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+
+    span {
+        position: relative;
+        padding: 0 0.75rem;
+    }
+
+    span::before,
+    span::after {
+        content: '';
+        display: block;
+        height: 1px;
+        width: 80px;
+        background: rgba(148, 163, 184, 0.5);
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    span::before {
+        left: -90px;
+    }
+
+    span::after {
+        right: -90px;
+    }
+}
+
+.assign-dialog__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 0.9rem;
+    }
+}
+
+.assign-dialog__action {
+    align-self: flex-start;
+    border-radius: 999px;
+}
+
 @media (min-width: 640px) {
     .card-actions {
         justify-content: flex-start;
@@ -346,6 +551,20 @@
     .view-dialog__grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    .assign-dialog {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .assign-dialog__section {
+        flex: 1;
+    }
+
+    .assign-dialog__divider span::before,
+    .assign-dialog__divider span::after {
+        width: 120px;
+    }
 }
 
 @media (max-width: 639px) {
@@ -355,6 +574,10 @@
 
     .results-summary {
         text-align: left;
+    }
+
+    .assign-dialog__action {
+        width: 100%;
     }
 }
 
