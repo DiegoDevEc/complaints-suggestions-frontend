@@ -91,6 +91,8 @@ export class Complaints implements OnInit {
         { value: 'PENDING', label: 'Pendiente' },
         { value: 'RESOLVED', label: 'Resuelto' },
         { value: 'IN_PROGRESS', label: 'En progreso' },
+        { value: 'RETURNED', label: 'Devuelto' },
+        { value: 'FORWARDED', label: 'Derivado' },
         { value: 'CANCEL', label: 'Cancelado' }
     ];
 
@@ -203,6 +205,10 @@ export class Complaints implements OnInit {
                 return 'warn';
             case 'RESOLVED':
                 return 'success';
+            case 'RETURNED':
+                return 'warn';
+            case 'FORWARDED':
+                return 'info';
             case 'IN_PROGRESS':
                 return 'info';
             case 'CANCEL':
@@ -218,6 +224,10 @@ export class Complaints implements OnInit {
                 return 'Pendiente';
             case 'RESOLVED':
                 return 'Resuelto';
+            case 'RETURNED':
+                return 'Devuelto';
+            case 'FORWARDED':
+                return 'Derivado';
             case 'IN_PROGRESS':
                 return 'En progreso';
             case 'CANCEL':

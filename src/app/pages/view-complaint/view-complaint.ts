@@ -7,7 +7,21 @@ import { ButtonModule } from 'primeng/button';
 import { firstValueFrom } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-type KnownStatus = 'PENDING' | 'RESOLVED' | 'IN_PROGRESS' | 'CANCEL';
+type KnownStatus = 'PENDING' | 'RESOLVED' | 'IN_PROGRESS' | 'CANCEL' | 'RETURNED' | 'FORWARDED';
+
+interface StatusHistoryUser {
+    name: string | null;
+    lastname: string | null;
+    email: string | null;
+    phone: string | null;
+}
+
+interface StatusHistoryEntry {
+    status: string | null;
+    changedAt: string | null;
+    changedBy: StatusHistoryUser | null;
+    note: string | null;
+}
 
 interface ViewFeedback {
     caseNumber: string;
@@ -20,6 +34,7 @@ interface ViewFeedback {
     dateRegister: string | null;
     status: string | null;
     attachmentUrl: string | null;
+    statusHistory: StatusHistoryEntry[];
 }
 
 @Component({
@@ -42,7 +57,9 @@ export class ViewComplaint {
         PENDING: 'Pendiente',
         RESOLVED: 'Resuelto',
         IN_PROGRESS: 'En progreso',
-        CANCEL: 'Cancelado'
+        CANCEL: 'Cancelado',
+        RETURNED: 'Devuelto',
+        FORWARDED: 'Derivado'
     };
 
     loading = false;
@@ -129,6 +146,27 @@ export class ViewComplaint {
         }).format(parsed);
     }
 
+    formatChangedBy(user: StatusHistoryUser | null): string {
+        if (!user) {
+            return 'Usuario no disponible';
+        }
+
+        const parts = [user.name, user.lastname].filter((value): value is string => !!value);
+        if (parts.length) {
+            return parts.join(' ');
+        }
+
+        if (user.email) {
+            return user.email;
+        }
+
+        if (user.phone) {
+            return user.phone;
+        }
+
+        return 'Usuario no disponible';
+    }
+
     private mapFeedback(response: unknown, fallbackCaseNumber: string): ViewFeedback | null {
         if (!response || typeof response !== 'object') {
             return null;
@@ -153,7 +191,8 @@ export class ViewComplaint {
             address: this.composeAddress((candidate as any).address ?? (candidate as any).addressLine ?? (candidate as any).location),
             dateRegister: this.toNullableString((candidate as any).dateRegister ?? (candidate as any).createdAt ?? (candidate as any).updatedAt) ?? null,
             status: this.toNullableString((candidate as any).status)?.toUpperCase() ?? null,
-            attachmentUrl: this.resolveAttachmentUrl((candidate as any).attachment ?? (candidate as any).image ?? (candidate as any).attachmentUrl)
+            attachmentUrl: this.resolveAttachmentUrl((candidate as any).attachment ?? (candidate as any).image ?? (candidate as any).attachmentUrl),
+            statusHistory: this.mapStatusHistory((candidate as any).statusHistory ?? (candidate as any).status_history ?? (candidate as any).statusChanges ?? (candidate as any).statusTimeline ?? (candidate as any).history)
         };
         return feedback;
     }
@@ -258,5 +297,122 @@ export class ViewComplaint {
         }
 
         return `${this.backendUrl}/${url}`;
+    }
+
+    private mapStatusHistory(raw: unknown): StatusHistoryEntry[] {
+        if (!Array.isArray(raw)) {
+            return [];
+        }
+
+        const mapped = raw
+            .map((entry): StatusHistoryEntry | null => {
+                if (!entry || typeof entry !== 'object') {
+                    return null;
+                }
+
+                const source = entry as Record<string, unknown>;
+                const status = this.toNullableString(
+                    source['status'] ?? source['state'] ?? source['statusName'] ?? source['newStatus'] ?? source['value']
+
+                );
+                const changedAt = this.toNullableString(
+                    source['changedAt'] ?? source['date'] ?? source['createdAt'] ?? source['updatedAt'] ?? source['timestamp']
+
+                );
+                const note = this.toNullableString(source['note'] ?? source['description'] ?? source['comment'] ?? source['detail']);
+                const changedBy = this.mapStatusHistoryUser(
+                    source['changedBy'] ?? source['user'] ?? source['updatedBy'] ?? source['modifiedBy'] ?? source['assignedTo']
+                );
+
+                if (!status && !changedAt && !note && !changedBy) {
+                    return null;
+                }
+
+                return {
+                    status: status?.toUpperCase() ?? null,
+                    changedAt: changedAt ?? null,
+                    changedBy,
+                    note
+                };
+            })
+            .filter((entry): entry is StatusHistoryEntry => !!entry);
+
+        mapped.sort((a, b) => {
+            const timeA = this.getComparableTimestamp(a.changedAt);
+            const timeB = this.getComparableTimestamp(b.changedAt);
+
+            if (!Number.isFinite(timeA) && !Number.isFinite(timeB)) {
+                return 0;
+            }
+
+            if (!Number.isFinite(timeA)) {
+                return 1;
+            }
+
+            if (!Number.isFinite(timeB)) {
+                return -1;
+            }
+
+            return timeA - timeB;
+        });
+
+        return mapped;
+    }
+
+    private mapStatusHistoryUser(raw: unknown): StatusHistoryUser | null {
+        if (!raw) {
+            return null;
+        }
+
+        if (typeof raw === 'string') {
+            const normalized = this.toNullableString(raw);
+            if (!normalized) {
+                return null;
+            }
+
+            return {
+                name: normalized,
+                lastname: null,
+                email: null,
+                phone: null
+            };
+        }
+
+        if (typeof raw !== 'object') {
+            return null;
+        }
+
+        const source = raw as Record<string, unknown>;
+        const fullName = this.toNullableString(source['fullName'] ?? source['displayName'] ?? source['username']);
+        const name = this.toNullableString(source['name'] ?? source['firstName'] ?? source['names']) ?? fullName;
+        const lastname = this.toNullableString(source['lastname'] ?? source['lastName'] ?? source['surname'] ?? source['secondName']);
+        const email = this.toNullableString(source['email'] ?? source['emailAddress'] ?? source['mail']);
+        const phone = this.toNullableString(
+            source['phone'] ?? source['phoneNumber'] ?? source['telephone'] ?? source['mobile'] ?? source['cellphone']
+        );
+
+        if (!name && !lastname && !email && !phone) {
+            return null;
+        }
+
+        return {
+            name,
+            lastname,
+            email,
+            phone
+        };
+    }
+
+    private getComparableTimestamp(value: string | null): number {
+        if (!value) {
+            return Number.POSITIVE_INFINITY;
+        }
+
+        const parsed = new Date(value).getTime();
+        if (Number.isNaN(parsed)) {
+            return Number.POSITIVE_INFINITY;
+        }
+
+        return parsed;
     }
 }

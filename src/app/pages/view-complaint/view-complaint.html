@@ -88,6 +88,44 @@
                     </div>
                 </div>
 
+                <div class="status-timeline" *ngIf="case.statusHistory.length > 0">
+                    <h3 class="timeline-title">Historial de estado</h3>
+                    <ol class="timeline-list">
+                        <li class="timeline-item" *ngFor="let event of case.statusHistory; let last = last">
+                            <div class="timeline-marker">
+                                <span class="marker-dot" [ngClass]="getStatusClass(event.status)" aria-hidden="true"></span>
+                                <span class="marker-line" *ngIf="!last" aria-hidden="true"></span>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <span class="timeline-status" [ngClass]="getStatusClass(event.status)">{{ getStatusLabel(event.status) }}</span>
+                                    <time class="timeline-date">{{ formatDate(event.changedAt) }}</time>
+                                </div>
+                                <div class="timeline-details">
+                                    <p class="timeline-user">
+                                        <span class="label">Actualizado por:</span>
+                                        <span>{{ formatChangedBy(event.changedBy) }}</span>
+                                    </p>
+                                    <p class="timeline-contact" *ngIf="event.changedBy?.email || event.changedBy?.phone">
+                                        <span *ngIf="event.changedBy?.email">
+                                            <span class="icon" aria-hidden="true">✉️</span>
+                                            {{ event.changedBy?.email }}
+                                        </span>
+                                        <span *ngIf="event.changedBy?.phone">
+                                            <span class="icon" aria-hidden="true">📞</span>
+                                            {{ event.changedBy?.phone }}
+                                        </span>
+                                    </p>
+                                    <p class="timeline-note" *ngIf="event.note">
+                                        <span class="label">Nota:</span>
+                                        {{ event.note }}
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
                 <div class="image-wrapper" *ngIf="case.attachmentUrl">
                     <img [src]="case.attachmentUrl" alt="Imagen adjunta al caso" loading="lazy" />
                 </div>

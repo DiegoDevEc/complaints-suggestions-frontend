@@ -308,6 +308,197 @@
     line-height: 1.5;
 }
 
+.status-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.timeline-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.timeline-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.timeline-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.25rem;
+}
+
+.timeline-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 20px;
+}
+
+.marker-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #c7d2fe;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08);
+}
+
+.marker-line {
+    flex: 1 1 auto;
+    width: 2px;
+    margin-top: 4px;
+    background: linear-gradient(180deg, rgba(148, 163, 184, 0.3), rgba(148, 163, 184, 0));
+}
+
+.timeline-content {
+    background: rgba(248, 250, 255, 0.9);
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 1rem 1.25rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.timeline-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.timeline-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid rgba(99, 102, 241, 0.18);
+    background: rgba(99, 102, 241, 0.12);
+    color: #312e81;
+}
+
+.timeline-status.status-pending {
+    background: rgba(250, 204, 21, 0.18);
+    border-color: rgba(250, 204, 21, 0.35);
+    color: #92400e;
+}
+
+.timeline-status.status-resolved {
+    background: rgba(16, 185, 129, 0.18);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: #047857;
+}
+
+.timeline-status.status-in-progress {
+    background: rgba(96, 165, 250, 0.18);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #1d4ed8;
+}
+
+.timeline-status.status-cancel {
+    background: rgba(248, 113, 113, 0.18);
+    border-color: rgba(248, 113, 113, 0.3);
+    color: #b91c1c;
+}
+
+.timeline-status.status-unknown {
+    background: rgba(203, 213, 225, 0.6);
+    border-color: rgba(203, 213, 225, 0.8);
+    color: #0f172a;
+}
+
+.marker-dot.status-pending {
+    border-color: rgba(250, 204, 21, 0.6);
+    background: #f59e0b;
+    box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.2);
+}
+
+.marker-dot.status-resolved {
+    border-color: rgba(16, 185, 129, 0.6);
+    background: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.18);
+}
+
+.marker-dot.status-in-progress {
+    border-color: rgba(59, 130, 246, 0.6);
+    background: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.marker-dot.status-cancel {
+    border-color: rgba(248, 113, 113, 0.6);
+    background: #ef4444;
+    box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.2);
+}
+
+.marker-dot.status-unknown {
+    border-color: rgba(148, 163, 184, 0.6);
+    background: #94a3b8;
+    box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.2);
+}
+
+.timeline-date {
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 500;
+}
+
+.timeline-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.timeline-user,
+.timeline-note {
+    margin: 0;
+}
+
+.timeline-user .label,
+.timeline-note .label {
+    font-weight: 600;
+    color: #1e293b;
+    margin-right: 0.35rem;
+}
+
+.timeline-contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    color: #475569;
+    margin: 0;
+}
+
+.timeline-contact span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.timeline-contact .icon {
+    font-size: 0.95rem;
+}
+
 .image-wrapper {
     border-radius: 20px;
     overflow: hidden;
@@ -351,5 +542,14 @@
         width: 56px;
         height: 56px;
         font-size: 1rem;
+    }
+
+    .timeline-item {
+        grid-template-columns: 20px 1fr;
+        gap: 1rem;
+    }
+
+    .timeline-content {
+        padding: 0.85rem 1rem;
     }
 }
