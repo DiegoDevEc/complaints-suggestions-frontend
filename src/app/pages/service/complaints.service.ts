@@ -48,8 +48,8 @@ export class ComplaintsService {
 
     constructor(private http: HttpClient) {}
 
-    getComplaints(page: number = 1, limit: number = 10) {
-        return this.http.get<FeedbackListResponse>(`${this.apiUrl}/private/feedback?page=${page}}&limit=${limit}}`);
+    getComplaints(page: number = 1, limit: number = 10, type: FeedbackType) {
+        return this.http.get<FeedbackListResponse>(`${this.apiUrl}/private/feedback?page=${page}&limit=${limit}&type=${type}`);
     }
 
     createComplaint(payload: FormData) {
@@ -67,6 +67,6 @@ export class ComplaintsService {
     }
 
     assignCompanyToFeedback(feedbackId: string, company: FeedbackCompany) {
-        return this.http.patch(`${this.apiUrl}/private/feedback/${feedbackId}/company`, { company });
+        return this.http.patch(`${this.apiUrl}/private/feedback/${feedbackId}/company`, company);
     }
 }

@@ -3,9 +3,13 @@ import { Complaints } from './complaints/complaints';
 import { MenuDemo } from '../uikit/menudemo';
 import { Users } from './users/users';
 import { Companies } from './companies/companies';
+import { SuggestionsComponent } from './suggestions/suggestions.component';
+import { CongratulationsComponent } from './congratulations/congratulations.component';
 
 export default [
     { path: 'complaints', data: { breadcrumb: 'Quejas' }, component: Complaints },
+    { path: 'suggestions', data: { breadcrumb: 'Sugerencias' }, component: SuggestionsComponent },
+    { path: 'congratulations', data: { breadcrumb: 'Felicitaciones' }, component: CongratulationsComponent },
     { path: 'users', data: { breadcrumb: 'Usuarios' }, component: Users },
     { path: 'companies', data: { breadcrumb: 'Empresas' }, component: Companies },
     { path: 'menu', data: { breadcrumb: 'Menu' }, component: MenuDemo },

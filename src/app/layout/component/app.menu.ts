@@ -27,13 +27,15 @@ export class AppMenu {
             {
                 label: 'Administración',
                 items: [
-                    { label: 'Quejas', icon: 'pi pi-fw pi-id-card', routerLink: ['/complaints/complaints'] },
+                    { label: 'Quejas', icon: 'pi pi-exclamation-triangle', routerLink: ['/complaints/complaints'] },
+                    { label: 'Sugerencias', icon: 'pi pi-lightbulb', routerLink: ['/complaints/suggestions'] },
+                    { label: 'Felicitaciones', icon: 'pi pi-heart', routerLink: ['/complaints/congratulations'] },
                     { label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/complaints/users'] },
                     { label: 'Empresas', icon: 'pi pi-fw pi-briefcase', routerLink: ['/complaints/companies'] },
-                    { label: 'Input', icon: 'pi pi-fw pi-check-square', routerLink: ['/uikit/input'] },
+                    /*{ label: 'Input', icon: 'pi pi-fw pi-check-square', routerLink: ['/uikit/input'] },
                     { label: 'Table', icon: 'pi pi-fw pi-table', routerLink: ['/uikit/table'] },
                     { label: 'Menu', icon: 'pi pi-fw pi-bars', routerLink: ['/uikit/menu'] },
-                    /*   { label: 'Button', icon: 'pi pi-fw pi-mobile', class: 'rotated-icon', routerLink: ['/uikit/button'] },
+                       { label: 'Button', icon: 'pi pi-fw pi-mobile', class: 'rotated-icon', routerLink: ['/uikit/button'] },
                      { label: 'Table', icon: 'pi pi-fw pi-table', routerLink: ['/uikit/table'] },
                      { label: 'List', icon: 'pi pi-fw pi-list', routerLink: ['/uikit/list'] },
                      { label: 'Tree', icon: 'pi pi-fw pi-share-alt', routerLink: ['/uikit/tree'] },
@@ -48,7 +50,7 @@ export class AppMenu {
                      { label: 'Misc', icon: 'pi pi-fw pi-circle', routerLink: ['/uikit/misc'] }*/
                 ]
             },
-            {
+           /* {
                 label: 'Pages',
                 icon: 'pi pi-fw pi-briefcase',
                 routerLink: ['/pages'],
@@ -69,7 +71,7 @@ export class AppMenu {
                         routerLink: ['/pages/empty']
                     }
                 ]
-            },
+            },*/
         ];
     }
 }

@@ -1,6 +1,5 @@
-import { LayoutService } from '@/layout/service/layout.service';
 import { NotificationsService } from '@/pages/service/notification.service';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 @Component({

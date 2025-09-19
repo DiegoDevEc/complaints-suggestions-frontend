@@ -1,32 +1,31 @@
-import { Select } from 'primeng/select';
-import { Component, OnInit, computed, signal } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { TagModule } from 'primeng/tag';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { CompaniesService, Company } from '@/pages/service/companies.service';
+import { ComplaintsService, Feedback, FeedbackCompany, FeedbackStatus } from '@/pages/service/complaints.service';
+import { NotificationsService } from '@/pages/service/notification.service';
+import { ImagePreviewDialogComponent } from '@/shared/components/image-preview-dialog/image-preview-dialog.component';
 import { CommonModule } from '@angular/common';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MessageService, ConfirmationService } from 'primeng/api';
+import { AvatarModule } from 'primeng/avatar';
+import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
+import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
+import { Select } from 'primeng/select';
+import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
-import { ComplaintsService, Feedback, FeedbackCompany, FeedbackStatus } from '@/pages/service/complaints.service';
-import { environment } from 'src/environments/environment';
-import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
-import { ImagePreviewDialogComponent } from '@/shared/components/image-preview-dialog/image-preview-dialog.component';
-import { PaginatorModule, PaginatorState } from 'primeng/paginator';
-import { AvatarModule } from 'primeng/avatar';
-import { NotificationsService } from '@/pages/service/notification.service';
-import { CompaniesService, Company } from '@/pages/service/companies.service';
 import { finalize, switchMap, tap } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Component({
-    selector: 'app-complaints',
-    standalone: true,
-    imports: [
+  selector: 'app-congratulations',
+  imports: [
         CommonModule,
         FormsModule,
         ButtonModule,
@@ -44,11 +43,11 @@ import { finalize, switchMap, tap } from 'rxjs';
         Select,
         DynamicDialogModule
     ],
-    templateUrl: './complaints.html',
-    styleUrl: './complaints.scss',
-    providers: [MessageService, ConfirmationService, ComplaintsService, DialogService, CompaniesService]
+  templateUrl: './congratulations.component.html',
+  styleUrl: './congratulations.component.scss',
+  providers: [MessageService, ConfirmationService, ComplaintsService, DialogService, CompaniesService]
 })
-export class Complaints implements OnInit {
+export class CongratulationsComponent implements OnInit{
     complaintsDialog: boolean = false;
     viewDialogVisible = false;
 
@@ -146,7 +145,7 @@ export class Complaints implements OnInit {
         const limit = event.rows ?? this.rows;
         const page = Math.floor(first / limit) + 1; // backend usa page base 1
 
-        this.complaintsService.getComplaints(page, limit, 'complaint').subscribe((response) => {
+        this.complaintsService.getComplaints(page, limit, 'compliment').subscribe((response) => {
             this.complaints.set(response.data);
             this.totalRecords = response.total;
             this.rows = limit;
