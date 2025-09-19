@@ -3,3 +3,28 @@
 @use './layout/layout.scss';
 @use 'primeicons/primeicons.css';
 @use './demo/demo.scss';
+
+.pi-button-blue {
+    background-color: #244086 !important;
+    border-color: #25282a !important;
+    color: white !important;
+}
+.pi-button-blue:hover {
+    background-color: rgb(2, 20, 109) !important;
+    border-color: #25282a !important;
+    color: white;
+}
+
+.pi-text-blue {
+    color: #244086 !important;
+}
+
+.layout-menu ul a.active-route {
+    font-weight: 700;
+    color: #244086 !important;
+}
+
+.p-button-blue {
+    background: #244086 !important;
+    color: #ffffff !important;
+}
