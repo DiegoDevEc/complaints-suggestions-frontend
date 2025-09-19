@@ -5,6 +5,12 @@ import { environment } from 'src/environments/environment';
 export type FeedbackStatus = 'PENDING' | 'RESOLVED' | 'IN_PROGRESS' | 'CANCEL' | 'RETURNED' | 'FORWARDED';
 export type FeedbackType = 'complaint' | 'compliment' | 'suggestion';
 
+export interface FeedbackCompany {
+    id: string;
+    name: string;
+    description: string;
+}
+
 export interface Feedback {
     _id: string;
     status: FeedbackStatus;
@@ -26,6 +32,7 @@ export interface Feedback {
     };
     dateRegister: string; // ISO 8601 string
     __v: number;
+    company?: FeedbackCompany | null;
 }
 
 export interface FeedbackListResponse {
@@ -41,8 +48,8 @@ export class ComplaintsService {
 
     constructor(private http: HttpClient) {}
 
-    getComplaints(page: number = 1, limit: number = 10) {
-        return this.http.get<FeedbackListResponse>(`${this.apiUrl}/private/feedback?page=${page}}&limit=${limit}}`);
+    getComplaints(page: number = 1, limit: number = 10, type: FeedbackType) {
+        return this.http.get<FeedbackListResponse>(`${this.apiUrl}/private/feedback?page=${page}&limit=${limit}&type=${type}`);
     }
 
     createComplaint(payload: FormData) {
@@ -57,5 +64,9 @@ export class ComplaintsService {
         console.log('Updating feedback:', feedback);
         let statusFeedback = { status: feedback.status };
         return this.http.patch(`${this.apiUrl}/private/feedback/${feedback._id}/status`, statusFeedback);
+    }
+
+    assignCompanyToFeedback(feedbackId: string, company: FeedbackCompany) {
+        return this.http.patch(`${this.apiUrl}/private/feedback/${feedbackId}/company`, company);
     }
 }

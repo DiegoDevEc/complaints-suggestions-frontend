@@ -41,6 +41,11 @@ export interface CompanyListResponse {
     limit: number;
 }
 
+export interface CreateCompanyPayload {
+    name: string;
+    description: string;
+}
+
 export interface NotAssignedUserPersonalData {
     _id: string;
     name: string;
@@ -83,6 +88,10 @@ export class CompaniesService {
             params = params.set('search', search.trim());
         }
         return this.http.get<CompanyListResponse>(this.companiesEndpoint, { params });
+    }
+
+    createCompany(payload: CreateCompanyPayload) {
+        return this.http.post<Company>(this.companiesEndpoint, payload);
     }
 
     updateCompany(companyId: string, payload: UpdateCompanyPayload) {
