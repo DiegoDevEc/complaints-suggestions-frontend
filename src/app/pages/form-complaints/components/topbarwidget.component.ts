@@ -1,3 +1,4 @@
+import { style } from '@angular/animations';
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { RippleModule } from 'primeng/ripple';
@@ -5,10 +6,10 @@ import { ButtonModule } from 'primeng/button';
 import { AppFloatingConfigurator } from "@/layout/component/app.floatingconfigurator";
 
 @Component({
-  selector: 'topbar-widget',
-  standalone: true,
-  imports: [RouterModule, ButtonModule, RippleModule, AppFloatingConfigurator],
-  template: `
+    selector: 'topbar-widget',
+    standalone: true,
+    imports: [RouterModule, ButtonModule, RippleModule, AppFloatingConfigurator],
+    template: `
     <nav class="w-full flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 bg-surface-0 dark:bg-surface-900 shadow-md">
       <!-- Logo -->
       <a class="flex items-center gap-2" routerLink="/">
@@ -18,6 +19,7 @@ import { AppFloatingConfigurator } from "@/layout/component/app.floatingconfigur
       <!-- Menú siempre visible -->
       <div class="flex items-center gap-4">
         <button
+          class="pi-text-blue"
           pButton
           pRipple
           label="Iniciar Sesión"
@@ -26,6 +28,7 @@ import { AppFloatingConfigurator } from "@/layout/component/app.floatingconfigur
           [text]="true">
         </button>
         <button
+          class="pi-text-blue"
           pButton
           pRipple
           label="Seguimiento"
@@ -40,5 +43,5 @@ import { AppFloatingConfigurator } from "@/layout/component/app.floatingconfigur
   `
 })
 export class TopbarWidget {
-  constructor(public router: Router) {}
+    constructor(public router: Router) { }
 }

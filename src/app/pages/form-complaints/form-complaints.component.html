@@ -10,7 +10,7 @@
             <!-- Acciones -->
             <div class="row between center mb-3">
                 <small class="muted">Puedes hacer clic en el mapa o usar tu ubicación.</small>
-                <button pButton type="button" label="Usar mi ubicación" icon="pi pi-compass"
+                <button pButton type="button" label="Usar mi ubicación" icon="pi pi-compass" class="p-button-rounded pi-button-blue"
                     (click)="requestUserLocation()"></button>
             </div>
 
@@ -29,6 +29,13 @@
                 <!-- Columna formulario -->
                 <div class="col-12 md:col-6">
                     <form [formGroup]="complaintForm" (ngSubmit)="onSubmit()" class="form">
+
+
+                        <div class="row end mt-5 mb-5">
+                            <button pButton type="submit" label="Enviar" icon="pi pi-send"
+                                class="p-button-rounded pi-button-blue"></button>
+                        </div>
+
                         <div class="grid gap-2">
                             <div class="col-12 md:col-6">
                                 <label for="firstName">Nombres</label>
@@ -81,7 +88,17 @@
                                     requerido</small>
                             </div>
 
+                            <!-- Coordenadas solo lectura (ocúltalas si no quieres mostrarlas) -->
+                            <div class="col-12 md:col-12">
+                                <label for="address">Dirección</label>
+                                <input pInputText id="address" formControlName="address" />
+                            </div>
+
+
                             <div class="col-12">
+                                <div class="upload-preview" *ngIf="previewUrl">
+                                    <img [src]="previewUrl" alt="Vista previa de la imagen seleccionada" />
+                                </div>
                                 <label class="field-label" for="attachment">Imagen</label>
                                 <div class="upload-wrapper" [class.drag-over]="isDragOver"
                                     (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
@@ -94,21 +111,13 @@
                                             <strong>Haz clic para subir</strong> o arrastra tu imagen aquí
                                         </span>
                                         <small class="upload-hint">Formatos admitidos: JPG, PNG o GIF (máx. 5MB)</small>
-                                        <span class="upload-file-name" *ngIf="attachmentName">{{ attachmentName }}</span>
+                                        <span class="upload-file-name" *ngIf="attachmentName">{{ attachmentName
+                                            }}</span>
                                     </label>
                                 </div>
-
-                                <div class="upload-preview" *ngIf="previewUrl">
-                                    <img [src]="previewUrl" alt="Vista previa de la imagen seleccionada" />
-                                </div>
-
                             </div>
 
-                            <!-- Coordenadas solo lectura (ocúltalas si no quieres mostrarlas) -->
-                            <div class="col-12 md:col-12">
-                                <label for="address">Dirección</label>
-                                <input pInputText id="address" formControlName="address" />
-                            </div>
+
                             @if (false) {
                             <div class="col-12 md:col-6">
                                 <label for="latitude">Latitud</label>
@@ -119,11 +128,6 @@
                                 <input pInputText id="longitude" formControlName="longitude" readonly />
                             </div>
                             }
-                        </div>
-
-                        <div class="row end mt-3">
-                            <button pButton type="submit" label="Enviar" icon="pi pi-send"
-                                class="p-button-rounded"></button>
                         </div>
                     </form>
                 </div>

@@ -25,10 +25,12 @@
                 </small>
             </div>
 
-            <button class="search-button" pButton pRipple type="submit" [disabled]="searchForm.invalid || loading" [rounded]="true"
+            <button class="search-button pi-button-blue" pButton pRipple type="submit" [disabled]="searchForm.invalid || loading" [rounded]="true"
                 [text]="true">
                 <ng-container *ngIf="!loading; else loadingLabel">Buscar</ng-container>
             </button>
+
+
 
             <button class="search-button" pButton pRipple label="Cancelar" routerLink="/" [rounded]="true" [text]="true" severity="danger">
             </button>
