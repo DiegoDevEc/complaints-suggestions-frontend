@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
@@ -42,9 +42,13 @@ import { GeocodingService } from '../service/geocoding.service';
     styleUrl: './form-complaints.component.scss',
     providers: [ComplaintsService, MessageService]
 })
-export class FormComplaintsComponent implements OnInit {
+export class FormComplaintsComponent implements OnInit, OnDestroy {
+
+    @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
 
     previewUrl: string | null = null;
+    attachmentName: string | null = null;
+    isDragOver = false;
 
     complaintForm!: FormGroup;
     submitted = false;
@@ -101,6 +105,12 @@ export class FormComplaintsComponent implements OnInit {
                 summary: 'Sitio no seguro',
                 detail: 'La geolocalización requiere HTTPS o localhost. Puedes seleccionar el punto manualmente.'
             });
+        }
+    }
+
+    ngOnDestroy(): void {
+        if (this.previewUrl) {
+            URL.revokeObjectURL(this.previewUrl);
         }
     }
 
@@ -161,15 +171,68 @@ export class FormComplaintsComponent implements OnInit {
         const input = event.target as HTMLInputElement;
         const file = input.files && input.files.length ? input.files[0] : null;
         if (file) {
-          // setea el archivo en el form
-          this.complaintForm.patchValue({ attachment: file });
-          this.complaintForm.get('attachment')?.updateValueAndValidity();
-
-          // genera la vista previa
-          this.previewUrl && URL.revokeObjectURL(this.previewUrl); // liberar anterior
-          this.previewUrl = URL.createObjectURL(file);
+            this.handleIncomingFile(file);
         }
-      }
+        this.resetFileInput();
+    }
+
+    onDragOver(event: DragEvent) {
+        event.preventDefault();
+        this.isDragOver = true;
+    }
+
+    onDragLeave(event: DragEvent) {
+        event.preventDefault();
+        this.isDragOver = false;
+    }
+
+    onFileDrop(event: DragEvent) {
+        event.preventDefault();
+        this.isDragOver = false;
+        const file = event.dataTransfer?.files && event.dataTransfer.files.length
+            ? event.dataTransfer.files[0]
+            : null;
+        if (file) {
+            this.handleIncomingFile(file);
+        }
+        this.resetFileInput();
+    }
+
+    private handleIncomingFile(file: File) {
+        if (!file.type.startsWith('image/')) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Formato inválido',
+                detail: 'Selecciona una imagen en formato PNG, JPG o GIF.'
+            });
+            return;
+        }
+
+        const maxSizeInMb = 5;
+        if (file.size > maxSizeInMb * 1024 * 1024) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Archivo muy grande',
+                detail: `La imagen debe pesar menos de ${maxSizeInMb}MB.`
+            });
+            return;
+        }
+
+        this.complaintForm.patchValue({ attachment: file });
+        this.complaintForm.get('attachment')?.updateValueAndValidity();
+
+        if (this.previewUrl) {
+            URL.revokeObjectURL(this.previewUrl);
+        }
+        this.previewUrl = URL.createObjectURL(file);
+        this.attachmentName = file.name;
+    }
+
+    private resetFileInput() {
+        if (this.fileInput) {
+            this.fileInput.nativeElement.value = '';
+        }
+    }
 
     private getCurrentPositionOnce(timeout = 10000): Promise<GeolocationPosition> {
         return new Promise((resolve, reject) => {
@@ -310,6 +373,8 @@ export class FormComplaintsComponent implements OnInit {
                 this.submitted = false;
                 this.selectedPosition = null;
                 this.previewUrl = null;
+                this.attachmentName = null;
+                this.resetFileInput();
             },
             error: (err) => {
                 const msg = err?.status === 401
