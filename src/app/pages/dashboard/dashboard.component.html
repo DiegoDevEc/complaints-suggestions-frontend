@@ -1,0 +1,146 @@
+<div class="flex flex-col gap-6">
+    <ng-container *ngIf="summary as data; else dashboardState">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            <p-card styleClass="state-card h-full">
+                <ng-template pTemplate="title">Total de feedbacks</ng-template>
+                <ng-template pTemplate="content">
+                    <div class="metric-value">{{ data.totalFeedbacks | number }}</div>
+                    <p class="metric-subtitle mt-2">Registros totales recibidos</p>
+                </ng-template>
+            </p-card>
+
+            <p-card styleClass="state-card h-full">
+                <ng-template pTemplate="title">Tasa de resolución</ng-template>
+                <ng-template pTemplate="content">
+                    <div class="metric-value">{{ data.resolutionRate | percent: '1.0-1' }}</div>
+                    <p class="metric-subtitle mt-2">Casos resueltos vs. totales</p>
+                </ng-template>
+            </p-card>
+
+            <p-card styleClass="state-card h-full">
+                <ng-template pTemplate="title">Tiempo promedio de resolución</ng-template>
+                <ng-template pTemplate="content">
+                    <div class="flex items-baseline gap-2">
+                        <span class="metric-value">{{ data.avgResolutionTime | number: '1.0-1' }}</span>
+                        <span class="text-lg font-medium">h</span>
+                    </div>
+                    <p class="metric-subtitle mt-2">Horas promedio para cerrar un caso</p>
+                </ng-template>
+            </p-card>
+
+            <p-card styleClass="state-card h-full">
+                <ng-template pTemplate="title">Feedbacks por usuario</ng-template>
+                <ng-template pTemplate="content">
+                    <div class="metric-value">{{ data.averageFeedbacksPerUser | number: '1.0-2' }}</div>
+                    <p class="metric-subtitle mt-2">Interacciones promedio por ciudadano</p>
+                </ng-template>
+            </p-card>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <p-card styleClass="chart-card h-full">
+                <ng-template pTemplate="title">Feedbacks por estado</ng-template>
+                <ng-template pTemplate="content">
+                    <div class="chart-container">
+                        <ng-container
+                            *ngIf="statusChartData && statusChartOptions && (statusChartData.datasets?.[0]?.data?.length ?? 0) > 0; else emptyStatusChart">
+                            <p-chart type="bar" [data]="statusChartData" [options]="statusChartOptions" style="height: 320px"></p-chart>
+                        </ng-container>
+                    </div>
+                </ng-template>
+            </p-card>
+
+            <p-card styleClass="chart-card h-full">
+                <ng-template pTemplate="title">Distribución por tipo</ng-template>
+                <ng-template pTemplate="content">
+                    <div class="chart-container">
+                        <ng-container
+                            *ngIf="typeChartData && typeChartOptions && (typeChartData.datasets?.[0]?.data?.length ?? 0) > 0; else emptyTypeChart">
+                            <p-chart type="doughnut" [data]="typeChartData" [options]="typeChartOptions"
+                                style="height: 320px"></p-chart>
+                        </ng-container>
+                    </div>
+                </ng-template>
+            </p-card>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <p-card styleClass="h-full">
+                <ng-template pTemplate="title">Top empresas derivadas</ng-template>
+                <ng-template pTemplate="content">
+                    <p-table [value]="data.topCompanies" responsiveLayout="scroll">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th class="w-16">#</th>
+                                <th>Entidad</th>
+                                <th class="text-right w-24">Casos</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-company let-index="rowIndex">
+                            <tr>
+                                <td>{{ index + 1 }}</td>
+                                <td>{{ company._id }}</td>
+                                <td class="text-right">{{ company.count }}</td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="3" class="py-6 text-center text-surface-500 dark:text-surface-400">
+                                    No hay empresas registradas en el periodo.
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </ng-template>
+            </p-card>
+
+            <p-card styleClass="chart-card h-full">
+                <ng-template pTemplate="title">Tendencia últimos 7 días</ng-template>
+                <ng-template pTemplate="content">
+                    <div class="chart-container">
+                        <ng-container
+                            *ngIf="feedbackTrendData && feedbackTrendOptions && (feedbackTrendData.datasets?.[0]?.data?.length ?? 0) > 0; else emptyTrendChart">
+                            <p-chart type="line" [data]="feedbackTrendData" [options]="feedbackTrendOptions"
+                                style="height: 320px"></p-chart>
+                        </ng-container>
+                    </div>
+                </ng-template>
+            </p-card>
+        </div>
+    </ng-container>
+</div>
+
+<ng-template #dashboardState>
+    <div *ngIf="loading" class="card flex flex-col items-center justify-center py-12 gap-4">
+        <p-progressSpinner styleClass="w-12 h-12" strokeWidth="4"></p-progressSpinner>
+        <span class="text-surface-500 dark:text-surface-400">Cargando métricas...</span>
+    </div>
+
+    <div *ngIf="!loading && error" class="card flex flex-col items-center justify-center py-12 gap-3 text-center">
+        <i class="pi pi-exclamation-triangle text-3xl text-red-500"></i>
+        <p class="text-xl font-semibold">No se pudieron cargar las métricas</p>
+        <p class="text-surface-500 dark:text-surface-400 max-w-md">{{ error }}</p>
+        <p-button label="Reintentar" icon="pi pi-refresh" (click)="retry()" />
+    </div>
+</ng-template>
+
+<ng-template #emptyStatusChart>
+    <div class="flex flex-col items-center justify-center text-center py-6 chart-placeholder gap-2">
+        <i class="pi pi-info-circle text-2xl"></i>
+        <span>No hay datos de estados disponibles.</span>
+    </div>
+</ng-template>
+
+<ng-template #emptyTypeChart>
+    <div class="flex flex-col items-center justify-center text-center py-6 chart-placeholder gap-2">
+        <i class="pi pi-chart-pie text-2xl"></i>
+        <span>No hay datos de tipos disponibles.</span>
+    </div>
+</ng-template>
+
+<ng-template #emptyTrendChart>
+    <div class="flex flex-col items-center justify-center text-center py-6 chart-placeholder gap-2">
+        <i class="pi pi-chart-line text-2xl"></i>
+        <span>No hay registros en los últimos días.</span>
+    </div>
+</ng-template>
