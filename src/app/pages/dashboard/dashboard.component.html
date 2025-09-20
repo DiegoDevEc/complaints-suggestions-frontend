@@ -12,7 +12,7 @@
             <p-card styleClass="state-card h-full">
                 <ng-template pTemplate="title">Tasa de resolución</ng-template>
                 <ng-template pTemplate="content">
-                    <div class="metric-value">{{ data.resolutionRate | percent: '1.0-1' }}</div>
+                    <div class="metric-value">{{ data.resolutionRate | percent: '1.0-2' }}</div>
                     <p class="metric-subtitle mt-2">Casos resueltos vs. totales</p>
                 </ng-template>
             </p-card>
@@ -24,7 +24,7 @@
                         <span class="metric-value">{{ data.avgResolutionTime | number: '1.0-1' }}</span>
                         <span class="text-lg font-medium">h</span>
                     </div>
-                    <p class="metric-subtitle mt-2">Horas promedio para cerrar un caso</p>
+                    <p class="metric-subtitle mt-2">Dias promedio para cerrar un caso</p>
                 </ng-template>
             </p-card>
 
