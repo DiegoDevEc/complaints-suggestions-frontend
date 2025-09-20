@@ -9,7 +9,6 @@ import { TableModule } from 'primeng/table';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { DashboardSummaryResponseDto } from './models/dashboard-summary-response.dto';
 import { DashboardService } from '../service/dashboard.service';
-import { Menu } from "primeng/menu";
 import { Product, ProductService } from '../service/product.service';
 
 interface DashboardTypeItem {

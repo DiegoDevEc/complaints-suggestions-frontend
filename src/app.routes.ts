@@ -5,6 +5,7 @@ import { Notfound } from './app/pages/notfound/notfound';
 import { FormComplaintsComponent } from '@/pages/form-complaints/form-complaints.component';
 import { authGuard } from '@/guards/auth.guard';
 import { ViewComplaint } from '@/pages/view-complaint/view-complaint';
+import { HeatMapComponent } from '@/pages/admin/heat-map/heat-map.component';
 
 export const appRoutes: Routes = [
     { path: '', component: FormComplaintsComponent },
@@ -14,6 +15,7 @@ export const appRoutes: Routes = [
         canActivate: [authGuard],
         children: [
             { path: 'dashboard', component: DashboardComponent },
+            { path: 'heat-map', data: { breadcrumb: 'Mapa de Calor' }, component: HeatMapComponent },
             { path: 'complaints', loadChildren: () => import('./app/pages/admin/admin.routes') },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
@@ -21,6 +23,6 @@ export const appRoutes: Routes = [
     },
     { path: 'notfound', component: Notfound },
     { path: 'auth', loadChildren: () => import('./app/pages/auth/auth.routes') },
-    {path: 'view-complaint', component: ViewComplaint},
+    { path: 'view-complaint', component: ViewComplaint },
     { path: '**', redirectTo: '/notfound' }
 ];

@@ -22,7 +22,8 @@ export class AppMenu {
         this.model = [
             {
                 label: 'Inicio',
-                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/dashboard'] }]
+                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/dashboard'] },
+                { label: 'Mapa de Calor', icon: 'pi pi-fw pi-map', routerLink: ['/heat-map'] }]
             },
             {
                 label: 'Administración',
@@ -50,28 +51,28 @@ export class AppMenu {
                      { label: 'Misc', icon: 'pi pi-fw pi-circle', routerLink: ['/uikit/misc'] }*/
                 ]
             },
-           /* {
-                label: 'Pages',
-                icon: 'pi pi-fw pi-briefcase',
-                routerLink: ['/pages'],
-                items: [
-                    {
-                        label: 'Crud',
-                        icon: 'pi pi-fw pi-pencil',
-                        routerLink: ['/pages/crud']
-                    },
-                    {
-                        label: 'Not Found',
-                        icon: 'pi pi-fw pi-exclamation-circle',
-                        routerLink: ['/pages/notfound']
-                    },
-                    {
-                        label: 'Empty',
-                        icon: 'pi pi-fw pi-circle-off',
-                        routerLink: ['/pages/empty']
-                    }
-                ]
-            },*/
+            /* {
+                 label: 'Pages',
+                 icon: 'pi pi-fw pi-briefcase',
+                 routerLink: ['/pages'],
+                 items: [
+                     {
+                         label: 'Crud',
+                         icon: 'pi pi-fw pi-pencil',
+                         routerLink: ['/pages/crud']
+                     },
+                     {
+                         label: 'Not Found',
+                         icon: 'pi pi-fw pi-exclamation-circle',
+                         routerLink: ['/pages/notfound']
+                     },
+                     {
+                         label: 'Empty',
+                         icon: 'pi pi-fw pi-circle-off',
+                         routerLink: ['/pages/empty']
+                     }
+                 ]
+             },*/
         ];
     }
 }
