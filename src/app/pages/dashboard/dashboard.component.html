@@ -1,0 +1,156 @@
+<div class="flex flex-col gap-6">
+    <ng-container *ngIf="summary as data; else dashboardState">
+
+        <div class="grid grid-cols-12 gap-8">
+
+            <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+                <div class="card mb-0">
+                    <div class="flex justify-between mb-4">
+                        <div>
+                            <span class="block text-muted-color font-medium mb-4">Total Registros</span>
+                            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">{{ data.totalFeedbacks
+                                | number }}</div>
+                        </div>
+                        <div class="flex items-center justify-center bg-blue-100 dark:bg-blue-400/10 rounded-border"
+                            style="width: 2.5rem; height: 2.5rem">
+                            <i class="pi pi-comments text-blue-500 text-xl"></i>
+                        </div>
+                    </div>
+                    <span class="text-muted-color">Registros totales recibidos</span>
+                </div>
+            </div>
+            <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+                <div class="card mb-0">
+                    <div class="flex justify-between mb-4">
+                        <div>
+                            <span class="block text-muted-color font-medium mb-4">Tasa de resolución</span>
+                            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">{{ data.resolutionRate
+                                | percent: '1.0-2' }}</div>
+                        </div>
+                        <div class="flex items-center justify-center bg-orange-100 dark:bg-orange-400/10 rounded-border"
+                            style="width: 2.5rem; height: 2.5rem">
+                            <i class="pi pi-chart-line text-orange-500 text-xl"></i>
+                        </div>
+                    </div>
+                    <span class="text-primary font-medium">Casos resueltos </span>
+                    <span class="text-muted-color">vs Total de Casos</span>
+                </div>
+            </div>
+            <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+                <div class="card mb-0">
+                    <div class="flex justify-between mb-4">
+                        <div>
+                            <span class="block text-muted-color font-medium mb-4">Tiempo de resolución</span>
+                            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">{{
+                                data.avgResolutionTime | number: '1.0-1' }}</div>
+                        </div>
+                        <div class="flex items-center justify-center bg-cyan-100 dark:bg-cyan-400/10 rounded-border"
+                            style="width: 2.5rem; height: 2.5rem">
+                            <i class="pi pi-history text-cyan-500 text-xl"></i>
+                        </div>
+                    </div>
+                    <span class="text-primary font-medium">Días </span>
+                    <span class="text-muted-color"> promedio para cerrar un caso</span>
+                </div>
+            </div>
+            <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+                <div class="card mb-0">
+                    <div class="flex justify-between mb-4">
+                        <div>
+                            <span class="block text-muted-color font-medium mb-4">Feedbacks por usuario</span>
+                            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">{{
+                                data.averageFeedbacksPerUser | number: '1.0-2' }}</div>
+                        </div>
+                        <div class="flex items-center justify-center bg-purple-100 dark:bg-purple-400/10 rounded-border"
+                            style="width: 2.5rem; height: 2.5rem">
+                            <i class="pi pi-comment text-purple-500 text-xl!"></i>
+                        </div>
+                    </div>
+                    <span class="text-primary font-medium">Interacciones </span>
+                    <span class="text-muted-color"> por ciudadano</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <div class="card mb-8!">
+                <div class="font-semibold text-xl mb-4">Top 5 de empresas derivadas</div>
+                <p-table [value]="data.topCompanies" [paginator]="false" [rows]="5" responsiveLayout="scroll">
+                    <ng-template #header>
+                        <tr>
+                            <th class="w-16">#</th>
+                            <th>Entidad</th>
+                            <th class="text-right w-24">Casos</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template #body let-company let-index="rowIndex">
+                        <tr>
+                            <td>{{ index + 1 }}</td>
+                            <td>{{ company._id }}</td>
+                            <td class="text-right">{{ company.count }}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+            <div class="card mb-8!">
+                <div class="font-semibold text-xl mb-4">Tendencia últimos 7 días</div>
+                <p-card>
+                    <ng-template pTemplate="content">
+                        <div>
+                            <ng-container
+                                *ngIf="feedbackTrendData && feedbackTrendOptions && (feedbackTrendData.datasets?.[0]?.data?.length ?? 0) > 0; else emptyTrendChart">
+                                <p-chart type="line" [data]="feedbackTrendData"
+                                    [options]="feedbackTrendOptions"></p-chart>
+                            </ng-container>
+                        </div>
+                    </ng-template>
+                </p-card>
+            </div>
+
+            <div class="card mb-8!">
+                <div class="font-semibold text-xl mb-4">Estado de casos</div>
+                <p-chart type="bar" [data]="statusChartData" [options]="statusChartOptions" class="h-100" />
+            </div>
+            <div class="card mb-8!">
+                <div class="font-semibold text-xl mb-4">Tipo de casos</div>
+                <p-chart type="doughnut" [data]="typeChartData" [options]="typeChartOptions" class="h-100" />
+            </div>
+        </div>
+
+    </ng-container>
+</div>
+
+<ng-template #dashboardState>
+    <div *ngIf="loading" class="card flex flex-col items-center justify-center py-12 gap-4">
+        <p-progressSpinner styleClass="w-12 h-12" strokeWidth="4"></p-progressSpinner>
+        <span class="text-surface-500 dark:text-surface-400">Cargando métricas...</span>
+    </div>
+
+    <div *ngIf="!loading && error" class="card flex flex-col items-center justify-center py-12 gap-3 text-center">
+        <i class="pi pi-exclamation-triangle text-3xl text-red-500"></i>
+        <p class="text-xl font-semibold">No se pudieron cargar las métricas</p>
+        <p class="text-surface-500 dark:text-surface-400 max-w-md">{{ error }}</p>
+        <p-button label="Reintentar" icon="pi pi-refresh" (click)="retry()" />
+    </div>
+</ng-template>
+
+<ng-template #emptyStatusChart>
+    <div class="flex flex-col items-center justify-center text-center py-6 chart-placeholder gap-2">
+        <i class="pi pi-info-circle text-2xl"></i>
+        <span>No hay datos de estados disponibles.</span>
+    </div>
+</ng-template>
+
+<ng-template #emptyTypeChart>
+    <div class="flex flex-col items-center justify-center text-center py-6 chart-placeholder gap-2">
+        <i class="pi pi-chart-pie text-2xl"></i>
+        <span>No hay datos de tipos disponibles.</span>
+    </div>
+</ng-template>
+
+<ng-template #emptyTrendChart>
+    <div class="flex flex-col items-center justify-center text-center py-6 chart-placeholder gap-2">
+        <i class="pi pi-chart-line text-2xl"></i>
+        <span>No hay registros en los últimos días.</span>
+    </div>
+</ng-template>

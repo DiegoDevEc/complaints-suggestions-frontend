@@ -1,0 +1,29 @@
+:host {
+    display: block;
+}
+
+.metric-value {
+    font-size: 2.5rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.metric-subtitle {
+    color: var(--text-color-secondary);
+}
+
+.chart-container {
+    min-height: 320px;
+}
+
+.state-card {
+    min-height: 220px;
+}
+
+.chart-card {
+    min-height: 420px;
+}
+
+.chart-placeholder {
+    color: var(--text-color-secondary);
+}
