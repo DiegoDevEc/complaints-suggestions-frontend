@@ -9,6 +9,8 @@ import { TableModule } from 'primeng/table';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { DashboardSummaryResponseDto } from './models/dashboard-summary-response.dto';
 import { DashboardService } from '../service/dashboard.service';
+import { Menu } from "primeng/menu";
+import { Product, ProductService } from '../service/product.service';
 
 interface DashboardTypeItem {
     key: string;
@@ -22,7 +24,8 @@ interface DashboardTypeItem {
     standalone: true,
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss',
-    imports: [CommonModule, CardModule, ChartModule, TableModule, ProgressSpinnerModule, ButtonModule]
+    imports: [CommonModule, CardModule, ChartModule, TableModule, ProgressSpinnerModule, ButtonModule,],
+    providers: [ProductService]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
     loading = false;
@@ -43,11 +46,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     feedbackTrendOptions: ChartOptions<'line'> | null = null;
 
-    private readonly destroy$ = new Subject<void>();
+    private readonly destroy$ = new Subject<void>()
 
-    constructor(private readonly dashboardService: DashboardService) {}
+    products!: Product[];
+
+    constructor(private readonly dashboardService: DashboardService, private productService: ProductService) {}
 
     ngOnInit(): void {
+        this.productService.getProductsSmall().then((data) => (this.products = data));
         this.loadDashboard();
     }
 
