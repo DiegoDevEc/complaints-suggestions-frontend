@@ -10,6 +10,7 @@ import { RippleModule } from 'primeng/ripple';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
 import { AuthService } from '@/services/auth.service';
 import { ToastModule } from 'primeng/toast';
+import { finalize } from 'rxjs';
 
 @Component({
     selector: 'app-login',
@@ -37,7 +38,7 @@ import { ToastModule } from 'primeng/toast';
                             <p-password id="password1" [(ngModel)]="password" placeholder="Password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
 
                              <button pButton  (click)="login()" label="Ingresar" icon="pi pi-send"
-                                class="p-button-rounded pi-button-blue w-full"></button>
+                                class="p-button-rounded pi-button-blue w-full" [loading]="isLoading" [disabled]="isLoading"></button>
                             <br><br>
                             <button severity="danger" pButton pRipple label="Cancelar" routerLink="/"  [rounded]="true"  [text]="true" class="w-full">
                              </button>
@@ -55,6 +56,8 @@ export class Login {
 
     checked: boolean = false;
 
+    isLoading = false;
+
     constructor(private auth: AuthService, private router: Router, private messageService: MessageService) { }
 
     login() {
@@ -65,10 +68,32 @@ export class Login {
             return;
         }
 
+        if (this.isLoading) {
+            return;
+        }
 
-        this.auth.login(this.email, this.password).subscribe({
-            next: () => this.router.navigateByUrl('/dashboard'),
-            error: (err) => console.error('Login error:', err)
+        this.isLoading = true;
+
+        this.auth.login(this.email, this.password).pipe(
+            finalize(() => this.isLoading = false)
+        ).subscribe({
+            next: () => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Inicio de sesión exitoso',
+                    detail: 'Has ingresado correctamente.'
+                });
+                setTimeout(() => this.router.navigateByUrl('/dashboard'), 500);
+            },
+            error: (err) => {
+                const detail = err?.status === 0
+                    ? 'No fue posible conectar con el servidor. Inténtalo nuevamente más tarde.'
+                    : err?.status === 401
+                        ? 'Credenciales incorrectas. Verifica tu correo y clave.'
+                        : 'Ocurrió un error al intentar iniciar sesión. Inténtalo nuevamente.';
+                this.messageService.add({ severity: 'error', summary: 'Error de inicio de sesión', detail });
+                console.error('Login error:', err);
+            }
         });
     }
 }

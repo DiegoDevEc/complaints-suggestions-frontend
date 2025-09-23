@@ -33,7 +33,7 @@
 
                         <div class="row end mt-5 mb-5">
                             <button pButton type="submit" label="Enviar" icon="pi pi-send"
-                                class="p-button-rounded pi-button-blue"></button>
+                                class="p-button-rounded pi-button-blue" [loading]="isSubmitting" [disabled]="isSubmitting"></button>
                         </div>
 
                         <div class="grid gap-2">
