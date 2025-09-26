@@ -2,8 +2,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 
-export type FeedbackReportType = 'COMPLAINT' | 'SUGGESTION' | 'CONGRATULATION';
-export type FeedbackReportStatus = 'OPEN' | 'IN_PROGRESS' | 'RETURNED' | 'CLOSED';
+export type FeedbackReportType = 'complaint' | 'suggestion' | 'compliment';
+export type FeedbackReportStatus = 'PENDING' | 'IN_PROGRESS' | 'RESOLVED' | 'RETURNED' | 'FORWARDED' | 'CANCEL';
 
 export interface ReportsFilters {
     startDate?: Date | string | null;
@@ -14,7 +14,7 @@ export interface ReportsFilters {
 
 @Injectable({ providedIn: 'root' })
 export class ReportsService {
-    private readonly baseUrl = `${environment.backendUrl}/api/private/reports`;
+    private readonly baseUrl = `${environment.backendUrl}/private/reports`;
 
     constructor(private http: HttpClient) {}
 

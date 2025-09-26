@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { finalize } from 'rxjs';
 import { FeedbackReportStatus, FeedbackReportType, ReportsFilters, ReportsService } from '@/services/reports.service';
+import { Select } from 'primeng/select';
 
 interface SelectOption<T> {
     label: string;
@@ -13,7 +14,7 @@ interface SelectOption<T> {
 @Component({
     selector: 'app-reports',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, ButtonModule],
+    imports: [CommonModule, ReactiveFormsModule, ButtonModule, Select],
     templateUrl: './reports.component.html'
 })
 export class ReportsComponent {
@@ -21,16 +22,18 @@ export class ReportsComponent {
     private readonly formBuilder = inject(FormBuilder);
 
     readonly typeOptions: SelectOption<FeedbackReportType>[] = [
-        { label: 'Quejas', value: 'COMPLAINT' },
-        { label: 'Sugerencias', value: 'SUGGESTION' },
-        { label: 'Felicitaciones', value: 'CONGRATULATION' }
+         { label: 'Queja', value: 'complaint' },
+        { label: 'Sugerencia', value: 'suggestion' },
+        { label: 'Felicitación', value: 'compliment' }
     ];
 
     readonly statusOptions: SelectOption<FeedbackReportStatus>[] = [
-        { label: 'Abierto', value: 'OPEN' },
-        { label: 'En progreso', value: 'IN_PROGRESS' },
-        { label: 'Devuelto', value: 'RETURNED' },
-        { label: 'Cerrado', value: 'CLOSED' }
+        { value: 'PENDING', label: 'Pendiente' },
+        { value: 'RESOLVED', label: 'Resuelto' },
+        { value: 'IN_PROGRESS', label: 'En progreso' },
+        { value: 'RETURNED', label: 'Devuelto' },
+        { value: 'FORWARDED', label: 'Derivado' },
+        { value: 'CANCEL', label: 'Cancelado' }
     ];
 
     readonly filtersForm: FormGroup = this.formBuilder.group({

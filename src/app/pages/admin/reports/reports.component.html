@@ -1,54 +1,45 @@
-<section class="reports">
-    <h1>Reportes de feedback</h1>
+<div class="card shadow-2 mb-4 p-4">
+    <h2 class="text-2xl font-semibold mb-4">📊 Reportes de Feedback</h2>
 
-    <form [formGroup]="filtersForm" class="reports__form">
-        <div class="reports__fields">
-            <div class="reports__field">
-                <label for="startDate">Fecha de inicio</label>
-                <input id="startDate" type="date" formControlName="startDate" />
-            </div>
-            <div class="reports__field">
-                <label for="endDate">Fecha de fin</label>
-                <input id="endDate" type="date" formControlName="endDate" />
-            </div>
-            <div class="reports__field">
-                <label for="type">Tipo</label>
-                <select id="type" formControlName="type">
-                    <option [ngValue]="null">Todos</option>
-                    <option *ngFor="let option of typeOptions" [value]="option.value">{{ option.label }}</option>
-                </select>
-            </div>
-            <div class="reports__field">
-                <label for="status">Estado</label>
-                <select id="status" formControlName="status">
-                    <option [ngValue]="null">Todos</option>
-                    <option *ngFor="let option of statusOptions" [value]="option.value">{{ option.label }}</option>
-                </select>
-            </div>
-        </div>
+    <form [formGroup]="filtersForm" class="grid formgrid">
+        <!-- Fecha inicio -->
+        <div class="reports__field"> <label for="startDate"><b>Fecha de inicio: </b></label> <input id="startDate" type="date"
+                formControlName="startDate" /> </div>
+        <!-- Fecha Fin -->
+        <div class="reports__field"> <label for="endDate"><b>Fecha de fin: </b></label> <input id="endDate" type="date"
+                formControlName="endDate" /> </div>
 
-        <p class="reports__error" *ngIf="isDateRangeInvalid">
-            La fecha de inicio no puede ser mayor que la fecha de fin.
-        </p>
 
-        <div class="reports__actions">
-            <button
-                pButton
-                type="button"
-                label="Descargar listado general"
-                icon="pi pi-download"
-                (click)="downloadFeedbacksReport()"
-                [disabled]="isDownloadingFeedbacks || isDateRangeInvalid"
-            ></button>
+            <!-- Tipo -->
+            <div class="col-12 md:col-6 field">
+                <label for="type" class="font-medium">Tipo</label>
+                <p-select id="type" [options]="typeOptions" formControlName="type" optionLabel="label"
+                    optionValue="value" placeholder="Todos" showClear="true" styleClass="w-full"></p-select>
+            </div>
 
-            <button
-                pButton
-                type="button"
-                label="Descargar por empresa"
-                icon="pi pi-building"
-                (click)="downloadFeedbacksByCompanyReport()"
-                [disabled]="isDownloadingByCompany || isDateRangeInvalid"
-            ></button>
-        </div>
+            <!-- Estado -->
+            <div class="col-12 md:col-6 field">
+                <label for="status" class="font-medium">Estado</label>
+                <p-select id="status" [options]="statusOptions" formControlName="status" optionLabel="label"
+                    optionValue="value" placeholder="Todos" showClear="true" styleClass="w-full"></p-select>
+            </div>
+
+            <!-- Error fechas -->
+            <div class="col-12" *ngIf="isDateRangeInvalid">
+                <small class="p-error block">
+                    ⚠️ La fecha de inicio no puede ser mayor que la fecha de fin.
+                </small>
+            </div>
+
+            <!-- Acciones -->
+            <div class="col-12 flex justify-content-end gap-3 mt-4">
+                <button pButton type="button" label="Listado general" icon="pi pi-download" class="p-button-primary"
+                    (click)="downloadFeedbacksReport()"
+                    [disabled]="isDownloadingFeedbacks || isDateRangeInvalid"></button>
+
+                <button pButton type="button" label="Por empresa" icon="pi pi-building" class="p-button-success"
+                    (click)="downloadFeedbacksByCompanyReport()"
+                    [disabled]="isDownloadingByCompany || isDateRangeInvalid"></button>
+            </div>
     </form>
-</section>
+</div>
