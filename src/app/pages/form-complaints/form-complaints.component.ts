@@ -17,6 +17,7 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { CommonModule } from '@angular/common';
 import { GeocodingService } from '../service/geocoding.service';
+import { finalize } from 'rxjs';
 import { ChatbotComponent } from '@/layout/component/app.chatboot';
 
 @Component({
@@ -54,6 +55,8 @@ export class FormComplaintsComponent implements OnInit, OnDestroy {
 
     complaintForm!: FormGroup;
     submitted = false;
+
+    isSubmitting = false;
 
     center: google.maps.LatLngLiteral | null = null;
     zoom = 18;
@@ -363,7 +366,15 @@ export class FormComplaintsComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.complaintsService.createComplaint(formData).subscribe({
+        if (this.isSubmitting) {
+            return;
+        }
+
+        this.isSubmitting = true;
+
+        this.complaintsService.createComplaint(formData).pipe(
+            finalize(() => this.isSubmitting = false)
+        ).subscribe({
             next: () => {
                 this.messageService.add({
                     severity: 'success',
@@ -379,9 +390,11 @@ export class FormComplaintsComponent implements OnInit, OnDestroy {
                 this.resetFileInput();
             },
             error: (err) => {
-                const msg = err?.status === 401
-                    ? 'No autorizado: inicia sesión para enviar el formulario.'
-                    : 'No se pudo enviar la información';
+                const msg = err?.status === 0
+                    ? 'No fue posible conectar con el servidor. Revisa tu conexión e inténtalo nuevamente.'
+                    : err?.status === 401
+                        ? 'No autorizado: inicia sesión para enviar el formulario.'
+                        : 'No se pudo enviar la información.';
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
             }
         });
