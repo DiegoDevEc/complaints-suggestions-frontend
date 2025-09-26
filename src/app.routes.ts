@@ -6,6 +6,7 @@ import { FormComplaintsComponent } from '@/pages/form-complaints/form-complaints
 import { authGuard } from '@/guards/auth.guard';
 import { ViewComplaint } from '@/pages/view-complaint/view-complaint';
 import { HeatMapComponent } from '@/pages/admin/heat-map/heat-map.component';
+import { ReportsComponent } from '@/pages/reports/reports.component';
 
 export const appRoutes: Routes = [
     { path: '', component: FormComplaintsComponent },
@@ -16,6 +17,7 @@ export const appRoutes: Routes = [
         children: [
             { path: 'dashboard', component: DashboardComponent },
             { path: 'heat-map', data: { breadcrumb: 'Mapa de Calor' }, component: HeatMapComponent },
+            { path: 'reports', data: { breadcrumb: 'Reportes' }, component: ReportsComponent },
             { path: 'complaints', loadChildren: () => import('./app/pages/admin/admin.routes') },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }

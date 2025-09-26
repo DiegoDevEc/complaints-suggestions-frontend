@@ -1,0 +1,48 @@
+<section class="reports-container">
+    <h1 class="reports-title">Descarga de reportes</h1>
+
+    <form [formGroup]="filtersForm" class="reports-form" novalidate>
+        <div class="form-grid">
+            <mat-form-field appearance="outline">
+                <mat-label>Fecha de inicio</mat-label>
+                <input matInput [matDatepicker]="startPicker" formControlName="startDate" placeholder="Seleccione una fecha" />
+                <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+                <mat-datepicker #startPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Fecha de fin</mat-label>
+                <input matInput [matDatepicker]="endPicker" formControlName="endDate" placeholder="Seleccione una fecha" />
+                <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+                <mat-datepicker #endPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Tipo de feedback</mat-label>
+                <mat-select formControlName="type">
+                    <mat-option [value]="null">Todos</mat-option>
+                    <mat-option *ngFor="let option of feedbackTypes" [value]="option.value">{{ option.label }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Estado</mat-label>
+                <mat-select formControlName="status">
+                    <mat-option [value]="null">Todos</mat-option>
+                    <mat-option *ngFor="let option of feedbackStatuses" [value]="option.value">{{ option.label }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </form>
+
+    <div class="actions">
+        <button mat-raised-button color="primary" (click)="downloadFeedbacksReport()" [disabled]="isDownloadingGeneral">
+            {{ isDownloadingGeneral ? 'Descargando…' : 'Descargar listado general' }}
+        </button>
+        <button mat-stroked-button color="primary" (click)="downloadFeedbacksByCompanyReport()" [disabled]="isDownloadingByCompany">
+            {{ isDownloadingByCompany ? 'Descargando…' : 'Descargar por empresa' }}
+        </button>
+    </div>
+
+    <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+</section>

@@ -45,7 +45,7 @@ export class AppMenu {
             {
                 label: 'Reportes',
                 items: [
-
+                    { label: 'Descargas', icon: 'pi pi-download', routerLink: ['/reports'] }
                 ]
             },
 
