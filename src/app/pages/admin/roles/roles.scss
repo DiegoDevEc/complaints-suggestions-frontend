@@ -1,0 +1,11 @@
+:host {
+    display: block;
+}
+
+p-table {
+    width: 100%;
+}
+
+p-dialog ::ng-deep .p-dialog-content {
+    padding-top: 0;
+}

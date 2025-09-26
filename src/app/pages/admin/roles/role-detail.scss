@@ -1,0 +1,13 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+.role-detail {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+p-card ::ng-deep .p-card-content {
+    padding-top: 0;
+}
