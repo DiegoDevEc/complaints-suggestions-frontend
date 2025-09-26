@@ -1,0 +1,174 @@
+<p-toast />
+<p-confirmDialog />
+
+<p-table
+    [value]="roles()"
+    [lazy]="true"
+    [paginator]="true"
+    [rows]="rows"
+    [totalRecords]="totalRecords()"
+    (onLazyLoad)="loadRoles($event)"
+    [loading]="loading()"
+    dataKey="_id"
+    currentPageReportTemplate="Del {first} al {last} de {totalRecords} roles"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[5, 10, 20, 50]"
+    class="shadow-sm"
+>
+    <ng-template #caption>
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div class="flex flex-col gap-1">
+                <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0 m-0">
+                    Roles del sistema
+                </h2>
+                <p class="text-sm text-surface-500 dark:text-surface-400 m-0">
+                    Administra los roles y permisos disponibles.
+                </p>
+            </div>
+            <div class="flex flex-col gap-3 md:flex-row md:items-center">
+                <form [formGroup]="filtersForm" class="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
+                    <p-iconfield class="w-full md:w-72">
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input
+                            pInputText
+                            type="text"
+                            class="w-full"
+                            placeholder="Buscar roles"
+                            formControlName="search"
+                        />
+                    </p-iconfield>
+                    <p-select
+                        formControlName="status"
+                        [options]="statusOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Estado"
+                        class="w-full md:w-48"
+                    />
+                </form>
+                <p-button
+                    label="Nuevo rol"
+                    icon="pi pi-plus"
+                    class="p-button-rounded pi-button-blue w-full md:w-auto"
+                    (click)="openNew()"
+                />
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #header>
+        <tr>
+            <th style="min-width: 12rem">Nombre</th>
+            <th style="min-width: 16rem">Descripción</th>
+            <th style="min-width: 8rem">Estado</th>
+            <th style="min-width: 16rem">Permisos</th>
+            <th style="width: 14rem">Acciones</th>
+        </tr>
+    </ng-template>
+
+    <ng-template #body let-role>
+        <tr>
+            <td>{{ role.name }}</td>
+            <td>{{ role.description || 'Sin descripción' }}</td>
+            <td>
+                <p-tag [value]="getStatusLabel(role.status)" [severity]="getStatusSeverity(role.status)" />
+            </td>
+            <td>
+                <div class="flex flex-wrap gap-2">
+                    <p-tag
+                        *ngFor="let permission of role.permissions || []"
+                        [value]="permission"
+                        severity="info"
+                    />
+                    <span *ngIf="!role.permissions || !role.permissions.length" class="text-surface-500 text-sm">
+                        Sin permisos
+                    </span>
+                </div>
+            </td>
+            <td>
+                <div class="flex flex-wrap gap-2">
+                    <p-button icon="pi pi-eye" [rounded]="true" outlined size="small" (click)="viewRole(role)" />
+                    <p-button icon="pi pi-pencil" [rounded]="true" outlined size="small" (click)="editRole(role)" />
+                    <p-button
+                        icon="pi pi-trash"
+                        severity="danger"
+                        [rounded]="true"
+                        outlined
+                        size="small"
+                        (click)="confirmDelete(role)"
+                    />
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+        <tr>
+            <td colspan="5" class="py-6 text-center text-surface-500 dark:text-surface-400">
+                No se encontraron roles.
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<p-dialog
+    [(visible)]="roleDialog"
+    [modal]="true"
+    [style]="{ width: '40rem' }"
+    [breakpoints]="{ '960px': '90vw', '640px': '95vw' }"
+    [dismissableMask]="true"
+    (onHide)="hideDialog()"
+    [header]="isEditMode ? 'Editar rol' : 'Crear rol'"
+>
+    <ng-template #content>
+        <form [formGroup]="roleForm" (ngSubmit)="saveRole()" class="flex flex-col gap-4">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div class="md:col-span-2">
+                    <label for="name" class="block font-semibold mb-2">Nombre</label>
+                    <input id="name" type="text" pInputText formControlName="name" fluid />
+                    <small class="text-red-500" *ngIf="isInvalid('name')">
+                        El nombre es obligatorio.
+                    </small>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="description" class="block font-semibold mb-2">Descripción</label>
+                    <textarea
+                        id="description"
+                        pTextarea
+                        formControlName="description"
+                        rows="3"
+                        class="w-full"
+                    ></textarea>
+                </div>
+                <div>
+                    <label for="status" class="block font-semibold mb-2">Estado</label>
+                    <p-select
+                        inputId="status"
+                        formControlName="status"
+                        [options]="statusOptions | slice:1"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Seleccione un estado"
+                        class="w-full"
+                    />
+                </div>
+                <div>
+                    <label for="permissions" class="block font-semibold mb-2">Permisos</label>
+                    <p-multiSelect
+                        inputId="permissions"
+                        formControlName="permissions"
+                        [options]="permissionOptions"
+                        defaultLabel="Seleccionar permisos"
+                        display="chip"
+                        class="w-full"
+                    />
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+                <p-button type="button" label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
+                <p-button type="submit" [label]="isEditMode ? 'Guardar cambios' : 'Crear rol'" icon="pi pi-check" />
+            </div>
+        </form>
+    </ng-template>
+</p-dialog>

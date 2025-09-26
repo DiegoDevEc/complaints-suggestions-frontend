@@ -1,0 +1,64 @@
+<div class="role-detail" *ngIf="!loading(); else loadingState">
+    <ng-container *ngIf="!error(); else errorState">
+        <p-card *ngIf="role() as currentRole" class="shadow-sm">
+            <ng-template #title>
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-surface-900 dark:text-surface-0 m-0">
+                            {{ currentRole.name }}
+                        </h2>
+                        <p class="text-sm text-surface-500 dark:text-surface-400 m-0">
+                            Detalles completos del rol
+                        </p>
+                    </div>
+                    <p-tag [value]="getStatusLabel(currentRole.status)" [severity]="getStatusSeverity(currentRole.status)" />
+                </div>
+            </ng-template>
+
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div class="flex flex-col gap-2">
+                    <span class="text-sm font-semibold text-surface-500 dark:text-surface-400">Descripción</span>
+                    <p class="text-base text-surface-900 dark:text-surface-0 m-0">
+                        {{ currentRole.description || 'Sin descripción disponible.' }}
+                    </p>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <span class="text-sm font-semibold text-surface-500 dark:text-surface-400">Estado</span>
+                    <p class="text-base text-surface-900 dark:text-surface-0 m-0">
+                        {{ getStatusLabel(currentRole.status) }}
+                    </p>
+                </div>
+                <div class="flex flex-col gap-2 md:col-span-2">
+                    <span class="text-sm font-semibold text-surface-500 dark:text-surface-400">Permisos asociados</span>
+                    <div class="flex flex-wrap gap-2">
+                        <p-tag
+                            *ngFor="let permission of currentRole.permissions || []"
+                            [value]="permission"
+                            severity="info"
+                        />
+                        <span *ngIf="!currentRole.permissions || !currentRole.permissions.length" class="text-surface-500 text-sm">
+                            Sin permisos asociados.
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-6">
+                <p-button label="Volver" icon="pi pi-arrow-left" severity="secondary" (click)="goBack()" />
+            </div>
+        </p-card>
+    </ng-container>
+</div>
+
+<ng-template #loadingState>
+    <div class="flex items-center justify-center py-10">
+        <span class="text-surface-500">Cargando información del rol...</span>
+    </div>
+</ng-template>
+
+<ng-template #errorState>
+    <p-message severity="error" [text]="error() || ''"></p-message>
+    <div class="flex justify-end mt-4">
+        <p-button label="Volver" icon="pi pi-arrow-left" severity="secondary" (click)="goBack()" />
+    </div>
+</ng-template>
