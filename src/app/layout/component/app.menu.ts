@@ -33,6 +33,7 @@ export class AppMenu {
                     { label: 'Felicitaciones', icon: 'pi pi-heart', routerLink: ['/complaints/congratulations'] },
                     { label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/complaints/users'] },
                     { label: 'Roles', icon: 'pi pi-id-card', routerLink: ['/complaints/roles'] },
+                    { label: 'Permisos', icon: 'pi pi-shield', routerLink: ['/complaints/permissions'] },
                     { label: 'Empresas', icon: 'pi pi-fw pi-briefcase', routerLink: ['/complaints/companies'] },
                     /*{ label: 'Input', icon: 'pi pi-fw pi-check-square', routerLink: ['/uikit/input'] },
                     { label: 'Table', icon: 'pi pi-fw pi-table', routerLink: ['/uikit/table'] },

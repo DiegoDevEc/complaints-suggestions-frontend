@@ -1,0 +1,54 @@
+<div class="permission-detail" *ngIf="!loading(); else loadingState">
+    <ng-container *ngIf="!error(); else errorState">
+        <p-card *ngIf="permission() as currentPermission" class="shadow-sm">
+            <ng-template #title>
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-surface-900 dark:text-surface-0 m-0">
+                            {{ currentPermission.name }}
+                        </h2>
+                        <p class="text-sm text-surface-500 dark:text-surface-400 m-0">
+                            Detalles completos del permiso
+                        </p>
+                    </div>
+                    <p-tag
+                        [value]="getStatusLabel(currentPermission.status)"
+                        [severity]="getStatusSeverity(currentPermission.status)"
+                    />
+                </div>
+            </ng-template>
+
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div class="flex flex-col gap-2 md:col-span-2">
+                    <span class="text-sm font-semibold text-surface-500 dark:text-surface-400">Descripción</span>
+                    <p class="text-base text-surface-900 dark:text-surface-0 m-0">
+                        {{ currentPermission.description || 'Sin descripción disponible.' }}
+                    </p>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <span class="text-sm font-semibold text-surface-500 dark:text-surface-400">Estado</span>
+                    <p class="text-base text-surface-900 dark:text-surface-0 m-0">
+                        {{ getStatusLabel(currentPermission.status) }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-6">
+                <p-button label="Volver" icon="pi pi-arrow-left" severity="secondary" (click)="goBack()" />
+            </div>
+        </p-card>
+    </ng-container>
+</div>
+
+<ng-template #loadingState>
+    <div class="flex items-center justify-center py-10">
+        <span class="text-surface-500">Cargando información del permiso...</span>
+    </div>
+</ng-template>
+
+<ng-template #errorState>
+    <p-message severity="error" [text]="error() || ''"></p-message>
+    <div class="flex justify-end mt-4">
+        <p-button label="Volver" icon="pi pi-arrow-left" severity="secondary" (click)="goBack()" />
+    </div>
+</ng-template>
