@@ -1,0 +1,54 @@
+<section class="reports">
+    <h1>Reportes de feedback</h1>
+
+    <form [formGroup]="filtersForm" class="reports__form">
+        <div class="reports__fields">
+            <div class="reports__field">
+                <label for="startDate">Fecha de inicio</label>
+                <input id="startDate" type="date" formControlName="startDate" />
+            </div>
+            <div class="reports__field">
+                <label for="endDate">Fecha de fin</label>
+                <input id="endDate" type="date" formControlName="endDate" />
+            </div>
+            <div class="reports__field">
+                <label for="type">Tipo</label>
+                <select id="type" formControlName="type">
+                    <option [ngValue]="null">Todos</option>
+                    <option *ngFor="let option of typeOptions" [value]="option.value">{{ option.label }}</option>
+                </select>
+            </div>
+            <div class="reports__field">
+                <label for="status">Estado</label>
+                <select id="status" formControlName="status">
+                    <option [ngValue]="null">Todos</option>
+                    <option *ngFor="let option of statusOptions" [value]="option.value">{{ option.label }}</option>
+                </select>
+            </div>
+        </div>
+
+        <p class="reports__error" *ngIf="isDateRangeInvalid">
+            La fecha de inicio no puede ser mayor que la fecha de fin.
+        </p>
+
+        <div class="reports__actions">
+            <button
+                pButton
+                type="button"
+                label="Descargar listado general"
+                icon="pi pi-download"
+                (click)="downloadFeedbacksReport()"
+                [disabled]="isDownloadingFeedbacks || isDateRangeInvalid"
+            ></button>
+
+            <button
+                pButton
+                type="button"
+                label="Descargar por empresa"
+                icon="pi pi-building"
+                (click)="downloadFeedbacksByCompanyReport()"
+                [disabled]="isDownloadingByCompany || isDateRangeInvalid"
+            ></button>
+        </div>
+    </form>
+</section>
