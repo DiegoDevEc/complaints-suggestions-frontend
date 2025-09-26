@@ -7,6 +7,8 @@ import { SuggestionsComponent } from './suggestions/suggestions.component';
 import { CongratulationsComponent } from './congratulations/congratulations.component';
 import { RolesComponent } from './roles/roles';
 import { RoleDetailComponent } from './roles/role-detail';
+import { PermissionsComponent } from './permissions/permissions';
+import { PermissionDetailComponent } from './permissions/permission-detail';
 
 export default [
     { path: 'complaints', data: { breadcrumb: 'Quejas' }, component: Complaints },
@@ -15,6 +17,8 @@ export default [
     { path: 'users', data: { breadcrumb: 'Usuarios' }, component: Users },
     { path: 'roles', data: { breadcrumb: 'Roles' }, component: RolesComponent },
     { path: 'roles/:id', data: { breadcrumb: 'Detalle de rol' }, component: RoleDetailComponent },
+    { path: 'permissions', data: { breadcrumb: 'Permisos' }, component: PermissionsComponent },
+    { path: 'permissions/:id', data: { breadcrumb: 'Detalle de permiso' }, component: PermissionDetailComponent },
     { path: 'companies', data: { breadcrumb: 'Empresas' }, component: Companies },
     { path: 'menu', data: { breadcrumb: 'Menu' }, component: MenuDemo },
     /*{ path: 'button', data: { breadcrumb: 'Button' }, component: ButtonDemo },

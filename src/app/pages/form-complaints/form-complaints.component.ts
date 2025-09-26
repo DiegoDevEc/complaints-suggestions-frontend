@@ -17,6 +17,7 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { CommonModule } from '@angular/common';
 import { GeocodingService } from '../service/geocoding.service';
+import { ChatbotComponent } from '@/layout/component/app.chatboot';
 
 @Component({
     selector: 'app-form-complaints',
@@ -35,12 +36,13 @@ import { GeocodingService } from '../service/geocoding.service';
         CheckboxModule,
         GoogleMapsModule,
         ReactiveFormsModule,
-        ToastModule
+        ToastModule,
+        ChatbotComponent
     ],
     standalone: true,
     templateUrl: './form-complaints.component.html',
     styleUrl: './form-complaints.component.scss',
-    providers: [ComplaintsService, MessageService]
+    providers: [ComplaintsService, MessageService, ]
 })
 export class FormComplaintsComponent implements OnInit, OnDestroy {
 
