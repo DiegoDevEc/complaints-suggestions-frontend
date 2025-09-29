@@ -34,6 +34,6 @@ export class FeedbackService {
       params = params.set('status', filters.status);
     }
 
-    return this.http.get<FeedbackGeoDto[]>(`${this.baseUrl}/feedbacks/geo`, { params });
+    return this.http.get<FeedbackGeoDto[]>(`${this.baseUrl}/private/dashboard/feedbacks/geo`, { params });
   }
 }
