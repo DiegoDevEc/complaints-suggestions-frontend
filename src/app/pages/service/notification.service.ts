@@ -5,7 +5,7 @@ import { io } from 'socket.io-client';
 @Injectable({ providedIn: 'root' })
 export class NotificationsService {
 
-    private socket = io('http://localhost:3000', {
+    private socket = io('http://hckk8oogsckgggc08w4wgg4k.31.97.12.29.sslip.io', {
         transports: ['websocket'],
         reconnection: true,
     });
